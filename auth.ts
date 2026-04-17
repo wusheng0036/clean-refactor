@@ -9,6 +9,9 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
+// 内存存储（用于邮箱验证令牌）
+const verificationTokens: Record<string, { identifier: string; token: string; expires: Date }> = {};
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
@@ -16,6 +19,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
     error: "/login",
     verifyRequest: "/verify-request",
+  },
+  // 使用内存 adapter
+  adapter: {
+    createUser: async (user: any) => {
+      return { id: user.email, ...user };
+    },
+    getUser: async (id: string) => {
+      return null;
+    },
+    getUserByEmail: async (email: string) => {
+      return null;
+    },
+    getUserByAccount: async ({ providerAccountId, provider }: { providerAccountId: string; provider: string }) => {
+      return null;
+    },
+    updateUser: async (user: any) => {
+      return user;
+    },
+    deleteUser: async (userId: string) => {
+      return null;
+    },
+    linkAccount: async (account: any) => {
+      return account;
+    },
+    unlinkAccount: async ({ providerAccountId, provider }: { providerAccountId: string; provider: string }) => {
+      return undefined;
+    },
+    createSession: async (session: any) => {
+      return session;
+    },
+    getSessionAndUser: async (sessionToken: string) => {
+      return null;
+    },
+    updateSession: async (session: any) => {
+      return session;
+    },
+    deleteSession: async (sessionToken: string) => {
+      return null;
+    },
+    createVerificationToken: async ({ identifier, token, expires }: { identifier: string; token: string; expires: Date }) => {
+      verificationTokens[identifier] = { identifier, token, expires };
+      return { identifier, token, expires };
+    },
+    useVerificationToken: async ({ identifier, token }: { identifier: string; token: string }) => {
+      const stored = verificationTokens[identifier];
+      if (stored && stored.token === token) {
+        delete verificationTokens[identifier];
+        return stored;
+      }
+      return null;
+    },
   },
   providers: [
     EmailProvider({
