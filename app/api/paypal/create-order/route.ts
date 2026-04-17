@@ -1,0 +1,58 @@
+import { NextResponse } from 'next/server';
+
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!;
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET!;
+const PAYPAL_MODE = process.env.PAYPAL_MODE || 'sandbox';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL!;
+const PRICE = process.env.NEXT_PUBLIC_PRODUCT_PRICE || '14.99';
+
+const PAYPAL_API = PAYPAL_MODE === 'live'
+  ? 'https://api.paypal.com'
+  : 'https://api.sandbox.paypal.com';
+
+export async function POST() {
+  try {
+    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64');
+    const tokenRes = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials',
+    });
+
+    if (!tokenRes.ok) throw new Error('Token Error');
+    const { access_token } = await tokenRes.json();
+
+    const orderRes = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: 'USD',
+            value: PRICE,
+          },
+          description: 'CleanRefactor AI Lifetime License',
+        }],
+        application_context: {
+          return_url: `${SITE_URL}/api/paypal/complete-payment`,
+          cancel_url: `${SITE_URL}/?canceled=true`,
+          shipping_preference: 'NO_SHIPPING',
+        },
+      }),
+    });
+
+    const order = await orderRes.json();
+    const approvalUrl = order.links.find((l: any) => l.rel === 'approve')?.href;
+    return NextResponse.json({ url: approvalUrl });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Pay Error' }, { status: 500 });
+  }
+}

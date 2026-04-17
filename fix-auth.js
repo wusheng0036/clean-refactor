@@ -1,0 +1,67 @@
+const fs = require('fs');
+
+// 修复 auth.ts
+fs.writeFileSync('auth.ts', `import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
+
+const isDev = process.env.NODE_ENV === "development";
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,
+  session: { strategy: "jwt" },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
+    ...(isDev
+      ? [
+          CredentialsProvider({
+            id: "local-dev",
+            name: "Local Dev",
+            credentials: {},
+            async authorize() {
+              return {
+                id: "dev-user-1",
+                email: "dev@example.com",
+                name: "Local Developer",
+              };
+            },
+          }),
+        ]
+      : []),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.email = token.email;
+      return session;
+    },
+  },
+});
+`);
+
+// 修复 route.ts
+fs.writeFileSync('app/api/auth/[...nextauth]/route.ts', `import { handlers } from "@/auth";
+
+export const { GET, POST } = handlers;
+`);
+
+console.log('✅ 两个文件已修复！');
