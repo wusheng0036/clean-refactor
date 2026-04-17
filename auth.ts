@@ -1,7 +1,4 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
 import { Resend } from "resend";
 
@@ -21,14 +18,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verifyRequest: "/verify-request",
   },
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
     EmailProvider({
       server: {
         host: "smtp.resend.com",
@@ -40,7 +29,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
       async sendVerificationRequest({ identifier: email, url, provider }) {
-        // 使用 Resend API 发送邮件
         if (!resend) {
           console.error("Resend not initialized");
           return;
@@ -69,22 +57,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       },
     }),
-    ...(isDev
-      ? [
-          CredentialsProvider({
-            id: "local-dev",
-            name: "Local Dev",
-            credentials: {},
-            async authorize() {
-              return {
-                id: "dev-user-1",
-                email: "dev@example.com",
-                name: "Local Developer",
-              };
-            },
-          }),
-        ]
-      : []),
   ],
   callbacks: {
     async jwt({ token, user }: { token: any; user: any }) {
