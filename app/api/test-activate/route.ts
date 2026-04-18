@@ -11,13 +11,19 @@ export async function POST(req: Request) {
     }
 
     // 激活当前登录用户
-    await activatePaid(session.user.email);
+    const success = await activatePaid(session.user.email);
     
-    return NextResponse.json({
-      success: true,
-      message: "Activated! You now have lifetime access.",
-      email: session.user.email,
-    });
+    if (success) {
+      return NextResponse.json({
+        success: true,
+        message: "Activated! You now have lifetime access.",
+        email: session.user.email,
+      });
+    } else {
+      return NextResponse.json({
+        error: "Failed to activate. User not found.",
+      }, { status: 404 });
+    }
   } catch (err: any) {
     console.error("Activate error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });

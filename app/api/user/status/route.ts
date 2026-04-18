@@ -1,15 +1,6 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-
-// 全局存储用户付费状态（Vercel serverless兼容）
-declare global {
-  var userStatus: Record<string, { isPaid: boolean }> | undefined;
-}
-
-const userStatus = globalThis.userStatus || {};
-if (!globalThis.userStatus) {
-  globalThis.userStatus = userStatus;
-}
+import { getUserByEmail, createUser, updateUserPaidStatus } from "@/lib/d1";
 
 export async function GET() {
   try {
@@ -20,15 +11,23 @@ export async function GET() {
 
     const email = session.user.email;
     
-    // 初始化用户（未付费）
-    if (!userStatus[email]) {
-      userStatus[email] = {
-        isPaid: false,
-      };
+    // 从D1获取用户
+    let user = await getUserByEmail(email);
+    
+    // 如果用户不存在，创建新用户
+    if (!user) {
+      const userId = crypto.randomUUID();
+      await createUser({
+        id: userId,
+        email: email,
+        name: session.user.name || undefined,
+        provider: 'google',
+      });
+      user = await getUserByEmail(email);
     }
 
     return NextResponse.json({
-      isPaid: userStatus[email].isPaid,
+      isPaid: user?.is_paid === 1 || user?.is_paid === true,
       email: email,
     });
   } catch (err) {
@@ -37,20 +36,33 @@ export async function GET() {
   }
 }
 
-// 检查用户是否有权限使用（内部使用）
-export async function checkAccess(email: string): Promise<boolean> {
-  return userStatus[email]?.isPaid || false;
+// 激活付费（支付后使用）
+export async function activatePaid(email: string): Promise<boolean> {
+  try {
+    const user = await getUserByEmail(email);
+    if (user) {
+      await updateUserPaidStatus(user.id, true);
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("Activate paid error:", err);
+    return false;
+  }
 }
 
-// 激活付费（支付后使用）
-export async function activatePaid(email: string): Promise<void> {
-  if (!userStatus[email]) {
-    userStatus[email] = { isPaid: false };
+// 检查用户是否有权限使用（内部使用）
+export async function checkAccess(email: string): Promise<boolean> {
+  try {
+    const user = await getUserByEmail(email);
+    return user?.is_paid === 1 || user?.is_paid === true;
+  } catch (err) {
+    console.error("Check access error:", err);
+    return false;
   }
-  userStatus[email].isPaid = true;
 }
 
 // 检查用户是否已付费（内部使用）
 export async function isUserPaid(email: string): Promise<boolean> {
-  return userStatus[email]?.isPaid || false;
+  return checkAccess(email);
 }
