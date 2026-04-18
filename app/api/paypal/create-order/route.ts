@@ -63,7 +63,7 @@ export async function POST(req: Request) {
           custom_id: email, // 将用户邮箱存入订单
         }],
         application_context: {
-          return_url: `${SITE_URL}/api/paypal/complete-payment`,
+          return_url: `${SITE_URL}/api/paypal/complete-payment?oid=${order.id}`,
           cancel_url: `${SITE_URL}/?canceled=true`,
           shipping_preference: 'NO_SHIPPING',
         },

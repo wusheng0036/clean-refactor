@@ -29,6 +29,7 @@ function generateLicenseKey(): string {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const orderId = searchParams.get('token');
+  const pendingOrderId = searchParams.get('oid'); // 从创建订单时传递的ID
 
   if (!orderId) {
     return NextResponse.redirect(`${SITE_URL}/?error=true`);
@@ -56,24 +57,34 @@ export async function GET(request: Request) {
 
     const captureData = await captureRes.json();
     console.log('PayPal capture data:', JSON.stringify(captureData, null, 2));
+    console.log('Pending orders:', pendingOrders);
+    console.log('Pending order ID from URL:', pendingOrderId);
     
     if (captureData.status === 'COMPLETED') {
-      // 从订单中获取用户邮箱（优先使用custom_id）
+      // 尝试多种方式获取用户邮箱
       const customId = captureData.purchase_units?.[0]?.custom_id;
-      const email = customId;
+      const emailFromPending = pendingOrderId ? pendingOrders[pendingOrderId] : null;
+      const email = customId || emailFromPending;
       
       console.log('Custom ID from order:', customId);
-      console.log('Email to activate:', email);
+      console.log('Email from pending orders:', emailFromPending);
+      console.log('Final email to activate:', email);
       
       if (email) {
         // 激活付费状态（终身制，无限使用）
-        await activatePaid(email);
+        const activated = await activatePaid(email);
+        console.log('Activation result:', activated);
+        
+        // 清理pending订单
+        if (pendingOrderId) {
+          delete pendingOrders[pendingOrderId];
+        }
         
         const licenseKey = generateLicenseKey();
         return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}&paid=true`);
       } else {
         // 无法获取邮箱，显示license key让用户手动激活
-        console.log('No email found in custom_id');
+        console.log('No email found');
         const licenseKey = generateLicenseKey();
         return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}`);
       }

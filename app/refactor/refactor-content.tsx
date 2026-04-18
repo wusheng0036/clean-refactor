@@ -262,21 +262,10 @@ cb(null,{user:user,orders:o,total:total});
         {/* 未付费提示 */}
         {!isPaid && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
-            <p className="text-red-300 mb-3">
+            <p className="text-red-300">
               Payment required to use this tool.
+              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Purchase Now →</Link>
             </p>
-            <div className="flex gap-3">
-              <Link href="/#pricing" className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors">
-                Purchase Now →
-              </Link>
-              <button
-                onClick={handleActivate}
-                disabled={activating}
-                className="inline-block bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-500 transition-colors disabled:opacity-50"
-              >
-                {activating ? 'Activating...' : '✅ I\'ve Paid - Activate'}
-              </button>
-            </div>
           </div>
         )}
 
