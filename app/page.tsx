@@ -1,7 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function Home() {
+  const { data: session, status: sessionStatus } = useSession();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
   const [license, setLicense] = useState('');
@@ -213,8 +216,64 @@ export default function Home() {
     },
   };
 
+  const handleTryFree = () => {
+    if (session) {
+      window.location.href = '/refactor';
+    } else {
+      signIn('google', { callbackUrl: '/refactor' });
+    }
+  };
+
   return (
     <div style={S.page}>
+      {/* 导航栏 */}
+      <nav style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '16px 24px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+      }}>
+        <div style={{ fontWeight: 800, fontSize: '20px', color: '#2563eb' }}>
+          CleanRefactor
+        </div>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          {sessionStatus === 'authenticated' ? (
+            <>
+              <span style={{ color: '#64748b', fontSize: '14px' }}>{session?.user?.email}</span>
+              <Link href="/refactor" style={{
+                background: '#2563eb',
+                color: '#fff',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: 600,
+              }}>
+                Start Refactoring
+              </Link>
+            </>
+          ) : (
+            <button 
+              onClick={() => signIn('google', { callbackUrl: '/refactor' })}
+              style={{
+                background: 'transparent',
+                border: '1px solid #2563eb',
+                color: '#2563eb',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 600,
+              }}
+            >
+              Login
+            </button>
+          )}
+        </div>
+      </nav>
+
       {/* 顶部 Hero */}
       <div style={S.hero}>
         <div style={S.badge}>
@@ -224,6 +283,44 @@ export default function Home() {
         <p style={S.heroSub}>
           Ship cleaner products faster. Automatically fix logic, improve structure, 
           and enforce best practices across your entire frontend stack.
+        </p>
+        
+        {/* CTA 按钮组 */}
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button 
+            onClick={handleTryFree}
+            style={{
+              background: '#10b981',
+              color: '#fff',
+              padding: '14px 28px',
+              borderRadius: '12px',
+              border: 'none',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4)',
+            }}
+          >
+            🚀 Try Free (3 Credits)
+          </button>
+          <button 
+            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{
+              background: '#fff',
+              color: '#2563eb',
+              padding: '14px 28px',
+              borderRadius: '12px',
+              border: '2px solid #2563eb',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            View Pricing
+          </button>
+        </div>
+        <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>
+          No credit card required for free trial
         </p>
       </div>
 
@@ -259,7 +356,7 @@ export default function Home() {
       </div>
 
       {/* 核心支付卡片 */}
-      <div style={S.priceWrap}>
+      <div id="pricing" style={S.priceWrap}>
         <div style={S.priceCard}>
           <div style={S.popularBadge}>Limited Launch Offer</div>
           
