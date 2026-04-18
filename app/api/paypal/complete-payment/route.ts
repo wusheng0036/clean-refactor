@@ -4,7 +4,7 @@ import { randomBytes } from 'crypto';
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET!;
 const PAYPAL_MODE = process.env.PAYPAL_MODE || 'sandbox';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL!;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || 'https://cleanrefactor-ai.vercel.app';
 
 const PAYPAL_API = PAYPAL_MODE === 'live'
   ? 'https://api.paypal.com'
