@@ -14,6 +14,7 @@ export function HomeContent() {
   const [activateKey, setActivateKey] = useState('');
   const [activateStatus, setActivateStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [activateMessage, setActivateMessage] = useState('');
+  const [manualActivateLoading, setManualActivateLoading] = useState(false);
 
   const PRICE = process.env.NEXT_PUBLIC_PRODUCT_PRICE || '14.99';
 
@@ -98,6 +99,33 @@ export function HomeContent() {
     } else {
       signIn('google', { callbackUrl: '/refactor' });
     }
+  };
+
+  // 手动激活（支付后使用）
+  const handleManualActivate = async () => {
+    setManualActivateLoading(true);
+    try {
+      const res = await fetch('/api/test-activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        setActivateStatus('success');
+        setActivateMessage('✅ Activated! Redirecting to app...');
+        setTimeout(() => {
+          window.location.href = '/refactor';
+        }, 2000);
+      } else {
+        setActivateStatus('error');
+        setActivateMessage(data.error || 'Activation failed');
+      }
+    } catch (err: any) {
+      setActivateStatus('error');
+      setActivateMessage(err.message);
+    }
+    setManualActivateLoading(false);
   };
 
   const handleActivate = async () => {
@@ -435,17 +463,32 @@ export function HomeContent() {
               <div style={{ fontSize: '48px', marginBottom: '12px' }}>🎉</div>
               <p style={{ fontWeight: 800, fontSize: '20px', marginBottom: '8px' }}>Payment Successful!</p>
               <p style={{ fontSize: '16px', opacity: 0.95, marginBottom: '16px' }}>Welcome to CleanRefactor AI PRO</p>
-              <div style={{ 
-                background: 'rgba(255,255,255,0.2)', 
-                padding: '12px 20px', 
-                borderRadius: '12px',
-                display: 'inline-block',
-                marginBottom: '16px'
-              }}>
-                <span style={{ fontSize: '14px', opacity: 0.9 }}>License Key: </span>
-                <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '16px' }}>{license}</span>
-              </div>
-              <p style={{ fontSize: '13px', opacity: 0.8 }}>Redirecting to app in 3 seconds...</p>
+              
+              <button
+                onClick={handleManualActivate}
+                disabled={manualActivateLoading}
+                style={{
+                  background: '#fff',
+                  color: '#059669',
+                  padding: '14px 28px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  cursor: manualActivateLoading ? 'not-allowed' : 'pointer',
+                  opacity: manualActivateLoading ? 0.7 : 1,
+                  marginBottom: '12px',
+                }}
+              >
+                {manualActivateLoading ? 'Activating...' : '✅ Click to Activate'}
+              </button>
+              
+              {activateStatus === 'success' && (
+                <p style={{ color: '#fff', fontSize: '14px' }}>{activateMessage}</p>
+              )}
+              {activateStatus === 'error' && (
+                <p style={{ color: '#fecaca', fontSize: '14px' }}>{activateMessage}</p>
+              )}
             </div>
           )}
           
