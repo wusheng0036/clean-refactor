@@ -28,6 +28,19 @@ interface AnalysisResult {
   score: { before: number; after: number };
 }
 
+interface ExecutionTraceResult {
+  predictedOrder: string[];
+  explanation: { step: number; action: string; output: string; reason: string }[];
+  eventLoopPhases: {
+    sync: string[];
+    microtask1: string[];
+    microtask2: string[];
+    microtask3: string[];
+    macrotask: string[];
+  };
+  keyInsight: string;
+}
+
 export function RefactorContent() {
   const { data: session, status } = useSession();
   const [code, setCode] = useState(`function getData(id,cb){
@@ -49,6 +62,8 @@ cb(null,{user:user,orders:o,total:total});
 }`);
   const [result, setResult] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [executionTrace, setExecutionTrace] = useState<ExecutionTraceResult | null>(null);
+  const [mode, setMode] = useState<"refactor" | "execution-trace">("refactor");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -90,6 +105,8 @@ cb(null,{user:user,orders:o,total:total});
     setError("");
     setResult("");
     setAnalysis(null);
+    setExecutionTrace(null);
+    setMode("refactor");
     
     try {
       const res = await fetch("/api/refactor", {
@@ -104,8 +121,12 @@ cb(null,{user:user,orders:o,total:total});
         setError(data.error || "Unknown error");
       } else {
         setResult(data.refactoredCode);
+        setMode(data.mode || "refactor");
         if (data.analysis) {
           setAnalysis(data.analysis);
+        }
+        if (data.executionTrace) {
+          setExecutionTrace(data.executionTrace);
         }
         fetchUserCredits();
       }
@@ -131,6 +152,8 @@ cb(null,{user:user,orders:o,total:total});
     setCode("");
     setResult("");
     setAnalysis(null);
+    setExecutionTrace(null);
+    setMode("refactor");
     setError("");
   };
 
@@ -263,7 +286,92 @@ cb(null,{user:user,orders:o,total:total});
           )}
         </button>
 
-        {/* Analysis Section */}
+        {/* Execution Trace Analysis */}
+        {executionTrace && (
+          <div className="bg-slate-800/50 rounded-lg p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">🔍 Execution Order Analysis</h2>
+              <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded">Event Loop</span>
+            </div>
+            
+            {/* Predicted Order */}
+            <div className="mb-4">
+              <h3 className="text-white font-medium mb-2">Predicted Output Order:</h3>
+              <div className="bg-slate-900 p-4 rounded-lg font-mono text-sm">
+                {executionTrace.predictedOrder?.map((item, idx) => (
+                  <span key={idx}>
+                    <span className="text-green-400">"{item}"</span>
+                    {idx < executionTrace.predictedOrder!.length - 1 && (
+                      <span className="text-gray-500"> → </span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Event Loop Phases */}
+            {executionTrace.eventLoopPhases && (
+              <div className="mb-4">
+                <h3 className="text-white font-medium mb-2">Event Loop Phases:</h3>
+                <div className="space-y-2">
+                  <div className="bg-blue-900/30 p-3 rounded-lg border border-blue-700">
+                    <span className="text-blue-400 font-medium text-sm">1. Sync:</span>
+                    <span className="text-gray-300 text-sm ml-2">{executionTrace.eventLoopPhases.sync?.join(' → ')}</span>
+                  </div>
+                  <div className="bg-yellow-900/30 p-3 rounded-lg border border-yellow-700">
+                    <span className="text-yellow-400 font-medium text-sm">2. Microtasks:</span>
+                    <div className="text-gray-300 text-sm mt-1">
+                      {executionTrace.eventLoopPhases.microtask1?.length > 0 && (
+                        <div>Round 1: {executionTrace.eventLoopPhases.microtask1.join(' → ')}</div>
+                      )}
+                      {executionTrace.eventLoopPhases.microtask2?.length > 0 && (
+                        <div>Round 2: {executionTrace.eventLoopPhases.microtask2.join(' → ')}</div>
+                      )}
+                      {executionTrace.eventLoopPhases.microtask3?.length > 0 && (
+                        <div>Round 3: {executionTrace.eventLoopPhases.microtask3.join(' → ')}</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="bg-red-900/30 p-3 rounded-lg border border-red-700">
+                    <span className="text-red-400 font-medium text-sm">3. Macrotask:</span>
+                    <span className="text-gray-300 text-sm ml-2">{executionTrace.eventLoopPhases.macrotask?.join(' → ')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Key Insight */}
+            {executionTrace.keyInsight && (
+              <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-700">
+                <h3 className="text-purple-400 font-medium mb-1">💡 Key Insight:</h3>
+                <p className="text-gray-300 text-sm">{executionTrace.keyInsight}</p>
+              </div>
+            )}
+
+            {/* Step by Step */}
+            {executionTrace.explanation && executionTrace.explanation.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-white font-medium mb-2">Step by Step:</h3>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {executionTrace.explanation.map((step, idx) => (
+                    <div key={idx} className="bg-slate-700/50 p-3 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <span className="text-blue-400 font-bold text-sm">{step.step}.</span>
+                        <div>
+                          <span className="text-gray-300 text-sm">{step.action}</span>
+                          <span className="text-green-400 text-sm ml-2">→ "{step.output}"</span>
+                          <p className="text-gray-500 text-xs mt-1">{step.reason}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Code Review Analysis */}
         {analysis && (
           <div className="bg-slate-800/50 rounded-lg p-6 mb-6">
             <div className="flex justify-between items-center mb-4">

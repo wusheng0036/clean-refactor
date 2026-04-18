@@ -80,6 +80,45 @@ Output STRICT JSON format:
   "score": { "before": 1-10, "after": 1-10 }
 }`;
 
+const EXECUTION_TRACE_PROMPT = `You are a JavaScript event loop expert. Analyze the code and predict the EXACT execution order of console.log statements.
+
+Analyze step by step:
+1. Synchronous code execution
+2. Microtask queue (Promises, async/await)
+3. Macrotask queue (setTimeout, setInterval)
+4. Event loop iterations
+
+Output format:
+{
+  "predictedOrder": ["start", "A1", "B1", "end", "p1", "B2", "A2", "p2", "A done", "timeout"],
+  "explanation": [
+    { "step": 1, "action": "同步代码执行", "output": "start", "reason": "直接执行" },
+    { "step": 2, "action": "调用A()", "output": "A1", "reason": "进入async函数，先执行同步部分" }
+  ],
+  "eventLoopPhases": {
+    "sync": ["start", "A1", "B1", "end"],
+    "microtask1": ["p1"],
+    "microtask2": ["B2", "p2"],
+    "microtask3": ["A2", "A done"],
+    "macrotask": ["timeout"]
+  },
+  "keyInsight": "await Promise.resolve()会产生微任务，导致p1在B2之前执行"
+}`;
+
+// 检测是否是执行顺序分析类代码（面试题风格）
+function isExecutionTraceCode(code: string): boolean {
+  const patterns = [
+    /console\.log\s*\(/g,           // 包含 console.log
+    /setTimeout\s*\(/g,             // 包含 setTimeout
+    /Promise\.(resolve|reject)\s*\(/g, // 包含 Promise
+    /async\s+function/g,            // 包含 async 函数
+    /await\s+/g,                    // 包含 await
+  ];
+  
+  const matches = patterns.filter(p => p.test(code)).length;
+  return matches >= 4; // 至少匹配4个模式才认为是执行顺序分析题
+}
+
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -95,6 +134,53 @@ export async function POST(req: Request) {
     const deducted = await deductCredit(session.user.email);
     if (!deducted) {
       return NextResponse.json({ error: "No credits remaining" }, { status: 403 });
+    }
+
+    // 检测是否是执行顺序分析类代码
+    const isTraceMode = isExecutionTraceCode(code);
+
+    if (isTraceMode) {
+      // 执行顺序分析模式
+      const traceRes = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "deepseek-ai/DeepSeek-V2.5",
+          messages: [
+            { role: "system", content: EXECUTION_TRACE_PROMPT },
+            { role: "user", content: `Analyze this code execution order:\n\n${code}` }
+          ],
+          temperature: 0.2,
+        }),
+      });
+
+      if (!traceRes.ok) {
+        const errorData = await traceRes.json();
+        console.error("OpenAI API error:", errorData);
+        return NextResponse.json({ error: "AI service error" }, { status: 500 });
+      }
+
+      const traceData = await traceRes.json();
+      const traceText = traceData.choices?.[0]?.message?.content || "";
+      
+      let executionTrace = null;
+      try {
+        const jsonMatch = traceText.match(/\{[\s\S]*\}/);
+        executionTrace = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+      } catch (e) {
+        console.error("Failed to parse execution trace:", e);
+      }
+
+      return NextResponse.json({
+        refactoredCode: code, // 原样返回
+        executionTrace,
+        mode: "execution-trace",
+        model: traceData.model,
+        usage: traceData.usage,
+      });
     }
 
     // Step 1: Refactor code
@@ -149,7 +235,6 @@ export async function POST(req: Request) {
         const analyzeData = await analyzeRes.json();
         const analysisText = analyzeData.choices?.[0]?.message?.content || "";
         try {
-          // Extract JSON from response
           const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
           analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
         } catch (e) {
@@ -161,6 +246,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       refactoredCode,
       analysis,
+      mode: "refactor",
       model: refactorData.model,
       usage: refactorData.usage,
     });
