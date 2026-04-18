@@ -228,6 +228,13 @@ cb(null,{user:user,orders:o,total:total});
               <span className={`font-bold ${isPaid ? 'text-yellow-400' : 'text-red-400'}`}>
                 {isPaid ? '⭐ PRO' : 'Free'}
               </span>
+              <button 
+                onClick={fetchUserStatus}
+                className="ml-2 text-xs text-gray-500 hover:text-white"
+                title="Refresh status"
+              >
+                🔄
+              </button>
             </div>
             <Link href="/" className="text-gray-400 hover:text-white transition-colors">← Home</Link>
           </div>

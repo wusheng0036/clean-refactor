@@ -1,8 +1,15 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
-// 内存存储用户付费状态（测试阶段）
-const userStatus: Record<string, { isPaid: boolean }> = {};
+// 全局存储用户付费状态（Vercel serverless兼容）
+declare global {
+  var userStatus: Record<string, { isPaid: boolean }> | undefined;
+}
+
+const userStatus = globalThis.userStatus || {};
+if (!globalThis.userStatus) {
+  globalThis.userStatus = userStatus;
+}
 
 export async function GET() {
   try {
