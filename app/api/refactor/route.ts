@@ -5,6 +5,54 @@ import { deductCredit } from "../user/credits/route";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
 
+const SYSTEM_PROMPT = `You are a senior software engineer and security expert. Refactor code to enterprise production standards with ZERO security vulnerabilities.
+
+SECURITY (CRITICAL - NEVER SKIP):
+- SQL queries MUST use parameterized queries (? placeholders) - NEVER string concatenation
+- Sanitize all user inputs before processing
+- Escape output to prevent XSS
+- Validate all external data with strict type checking
+
+MODERN JAVASCRIPT/TYPESCRIPT:
+- Convert ALL callbacks to async/await with Promise
+- Use const/let instead of var
+- Prefer arrow functions for callbacks
+- Use destructuring and spread operators
+- Use optional chaining (?.) and nullish coalescing (??)
+
+NAMING CONVENTIONS:
+- Boolean: is/has/should prefix (isActive, hasPermission)
+- Functions: verb + noun (getUserById, calculateTotalPrice)
+- Constants: UPPER_SNAKE_CASE (ORDER_STATUS_COMPLETED)
+- Extract ALL magic numbers to named constants
+
+ERROR HANDLING:
+- Validate ALL inputs at function entry
+- Throw descriptive errors with context
+- Wrap async operations in try-catch blocks
+- Never swallow errors silently
+
+CODE STRUCTURE:
+- Maximum 2 levels of nesting (extract to helper functions)
+- Single function: max 40 lines
+- Pure functions preferred (no side effects)
+- Use functional methods: map/filter/reduce instead of for-loops
+
+DATABASE:
+- ALWAYS use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])
+- NEVER use string concatenation for SQL
+- Handle connection errors gracefully
+
+DOCUMENTATION:
+- JSDoc with @param types, @returns, @throws
+- Document security considerations
+- TODO for incomplete implementations
+
+OUTPUT:
+- Return ONLY the refactored code
+- No markdown code blocks, no explanations
+- Code must be secure, modern, and production-ready`;
+
 export async function POST(req: Request) {
   try {
     // 检查登录
@@ -36,49 +84,14 @@ export async function POST(req: Request) {
         messages: [
           {
             role: "system",
-            content: `You are a senior software engineer specializing in code quality and production-ready code. Refactor the provided code to meet enterprise standards:
-
-NAMING CONVENTIONS:
-- Boolean variables: use is/has/should prefix (isActive, hasPermission, shouldRetry)
-- Functions: use verb + noun (getUserById, calculateTotalPrice, validateInput)
-- Constants: UPPER_SNAKE_CASE (MAX_RETRY_COUNT, DEFAULT_TIMEOUT)
-- Classes/Types: PascalCase (UserProfile, PaymentService)
-
-ERROR HANDLING:
-- Validate all function inputs with descriptive error messages
-- Use try-catch for async operations
-- Include context in error messages (e.g., "Invalid userId 'abc': expected number")
-- Never swallow errors silently
-
-CODE QUALITY:
-- Extract all magic numbers to named constants with comments
-- Maximum 3 levels of nesting (refactor nested conditions)
-- Single function: max 50 lines, single responsibility
-- Use early returns to reduce nesting
-- Prefer immutable operations (map/filter/reduce over for-loops)
-
-TYPESCRIPT (if applicable):
-- Add explicit return types
-- Define interfaces for all objects
-- Use type guards for runtime checks
-- Avoid 'any' type
-
-DOCUMENTATION:
-- JSDoc for all public functions with @param and @returns
-- Inline comments for complex business logic
-- TODO comments for known issues
-
-OUTPUT:
-- Return ONLY the refactored code
-- No explanations, no markdown code blocks
-- Code must be production-ready and compile without errors`
+            content: SYSTEM_PROMPT
           },
           {
             role: "user",
             content: `Refactor this code to production quality:\n\n${code}`
           }
         ],
-        temperature: 0.3,
+        temperature: 0.2,
       }),
     });
 
