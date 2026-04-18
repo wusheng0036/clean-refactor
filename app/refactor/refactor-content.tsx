@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 
-interface UserCredits {
-  credits: number;
+interface UserStatus {
   isPaid: boolean;
 }
 
@@ -68,36 +67,38 @@ cb(null,{user:user,orders:o,total:total});
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const [userCredits, setUserCredits] = useState<UserCredits | null>(null);
-  const [creditsLoading, setCreditsLoading] = useState(true);
+  const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
+  const [statusLoading, setStatusLoading] = useState(true);
 
+  // 获取用户付费状态
   useEffect(() => {
     if (session?.user?.email) {
-      fetchUserCredits();
+      fetchUserStatus();
     } else {
-      setCreditsLoading(false);
+      setStatusLoading(false);
     }
   }, [session]);
 
-  const fetchUserCredits = async () => {
+  const fetchUserStatus = async () => {
     try {
-      const res = await fetch("/api/user/credits");
+      const res = await fetch("/api/user/status");
       if (res.ok) {
         const data = await res.json();
-        setUserCredits(data);
+        setUserStatus(data);
       }
     } catch (err) {
-      console.error("Failed to fetch credits:", err);
+      console.error("Failed to fetch user status:", err);
     } finally {
-      setCreditsLoading(false);
+      setStatusLoading(false);
     }
   };
 
   const handleRefactor = async () => {
     if (!code.trim()) return;
     
-    if (userCredits && userCredits.credits <= 0 && !userCredits.isPaid) {
-      setError("No credits remaining. Please upgrade to continue.");
+    // 检查用户是否已付费
+    if (!userStatus?.isPaid) {
+      setError("Payment required. Please purchase to continue.");
       return;
     }
     
@@ -128,7 +129,6 @@ cb(null,{user:user,orders:o,total:total});
         if (data.executionTrace) {
           setExecutionTrace(data.executionTrace);
         }
-        fetchUserCredits();
       }
     } catch (error: any) {
       setError(error.message || "Error processing code");
@@ -177,7 +177,7 @@ cb(null,{user:user,orders:o,total:total});
     );
   }
 
-  if (status === "loading" || creditsLoading) {
+  if (status === "loading" || statusLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-white">Loading...</div>
@@ -185,7 +185,7 @@ cb(null,{user:user,orders:o,total:total});
     );
   }
 
-  const hasCredits = userCredits && (userCredits.credits > 0 || userCredits.isPaid);
+  const isPaid = userStatus?.isPaid;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 md:p-8">
@@ -197,23 +197,23 @@ cb(null,{user:user,orders:o,total:total});
             <p className="text-gray-400 text-sm mt-1">{session?.user?.email}</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-              <span className="text-gray-400 text-sm">Credits: </span>
-              <span className={`font-bold ${hasCredits ? 'text-green-400' : 'text-red-400'}`}>
-                {userCredits?.credits ?? 0}
+            {/* 付费状态显示 */}
+            <div className={`px-4 py-2 rounded-lg border ${isPaid ? 'bg-green-900/30 border-green-700' : 'bg-red-900/30 border-red-700'}`}>
+              <span className="text-gray-400 text-sm">Status: </span>
+              <span className={`font-bold ${isPaid ? 'text-green-400' : 'text-red-400'}`}>
+                {isPaid ? '⭐ PRO' : 'Free'}
               </span>
-              {userCredits?.isPaid && <span className="ml-2 text-yellow-400 text-xs">⭐ PRO</span>}
             </div>
             <Link href="/" className="text-gray-400 hover:text-white transition-colors">← Home</Link>
           </div>
         </div>
 
-        {/* No Credits Warning */}
-        {!hasCredits && (
+        {/* 未付费提示 */}
+        {!isPaid && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
             <p className="text-red-300">
-              You have no credits. Please purchase to continue.
-              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Buy Credits →</Link>
+              Payment required to use this tool.
+              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Purchase Now →</Link>
             </p>
           </div>
         )}
@@ -224,7 +224,10 @@ cb(null,{user:user,orders:o,total:total});
           <div className="flex flex-col">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white font-medium">Input Code</label>
-              <button onClick={handleClear} className="text-xs text-gray-400 hover:text-red-400 flex items-center gap-1">
+              <button
+                onClick={handleClear}
+                className="text-xs text-gray-400 hover:text-red-400 flex items-center gap-1"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
@@ -268,7 +271,7 @@ cb(null,{user:user,orders:o,total:total});
         {/* Action Button */}
         <button
           onClick={handleRefactor}
-          disabled={loading || !hasCredits}
+          disabled={loading || !isPaid}
           className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 mb-6"
         >
           {loading ? (
@@ -279,10 +282,10 @@ cb(null,{user:user,orders:o,total:total});
               </svg>
               Processing...
             </>
-          ) : hasCredits ? (
+          ) : isPaid ? (
             <>⚡ Refactor Code</>
           ) : (
-            "No Credits"
+            "🔒 Purchase Required"
           )}
         </button>
 
@@ -446,10 +449,10 @@ cb(null,{user:user,orders:o,total:total});
         )}
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-slate-800/50 rounded-lg">
-            <h3 className="text-white font-medium mb-2">💳 Pay Per Use</h3>
-            <p className="text-gray-400 text-sm">Purchase credits to use the tool</p>
+            <h3 className="text-white font-medium mb-2">💎 Lifetime Access</h3>
+            <p className="text-gray-400 text-sm">One-time payment, unlimited use</p>
           </div>
           <div className="p-4 bg-slate-800/50 rounded-lg">
             <h3 className="text-white font-medium mb-2">⚡ Fast Processing</h3>

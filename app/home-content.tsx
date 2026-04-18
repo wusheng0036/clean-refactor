@@ -21,13 +21,13 @@ export function HomeContent() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const licenseFromBackend = params.get('license');
-    const creditsAdded = params.get('credits');
+    const paid = params.get('paid');
     if (params.get('success')) {
       setStatus('success');
       if (licenseFromBackend) setLicense(licenseFromBackend);
-      if (creditsAdded) {
+      if (paid) {
         setActivateStatus('success');
-        setActivateMessage(`Payment successful! ${creditsAdded} credits added to your account.`);
+        setActivateMessage('Payment successful! You now have lifetime access.');
       }
     } else if (params.get('canceled')) {
       setStatus('canceled');
@@ -449,48 +449,26 @@ export function HomeContent() {
             <span>30-Day Refund</span>
           </div>
 
-          {/* 激活码输入区域 */}
-          {sessionStatus === 'authenticated' && (
+          {/* 支付成功信息 */}
+          {status === 'success' && (
             <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
-              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '12px' }}>Already have a license key?</p>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  type="text"
-                  value={activateKey}
-                  onChange={(e) => setActivateKey(e.target.value)}
-                  placeholder="Enter license key"
-                  style={{
-                    flex: 1,
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    border: '1px solid #e2e8f0',
-                    fontSize: '14px',
-                  }}
-                />
-                <button
-                  onClick={handleActivate}
-                  disabled={activateStatus === 'loading' || !activateKey.trim()}
-                  style={{
-                    padding: '12px 20px',
-                    background: activateStatus === 'success' ? '#10b981' : '#2563eb',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    border: 'none',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    cursor: activateStatus === 'loading' ? 'not-allowed' : 'pointer',
-                    opacity: activateStatus === 'loading' ? 0.7 : 1,
-                  }}
-                >
-                  {activateStatus === 'loading' ? 'Activating...' : 'Activate'}
-                </button>
+              <div style={{ background: '#ecfdf5', padding: '16px', borderRadius: '12px', border: '1px solid #10b981' }}>
+                <p style={{ color: '#065f46', fontWeight: 600 }}>🎉 Payment Successful!</p>
+                <p style={{ color: '#047857', fontSize: '14px', marginTop: '4px' }}>You now have lifetime access to CleanRefactor AI.</p>
+                <Link href="/refactor" style={{
+                  display: 'inline-block',
+                  marginTop: '12px',
+                  background: '#10b981',
+                  color: '#fff',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                }}>
+                  Start Refactoring →
+                </Link>
               </div>
-              {activateStatus === 'success' && (
-                <p style={{ color: '#10b981', fontSize: '13px', marginTop: '8px' }}>✅ {activateMessage}</p>
-              )}
-              {activateStatus === 'error' && (
-                <p style={{ color: '#ef4444', fontSize: '13px', marginTop: '8px' }}>❌ {activateMessage}</p>
-              )}
             </div>
           )}
         </div>

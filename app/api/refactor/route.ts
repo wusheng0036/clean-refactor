@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import { deductCredit } from "../user/credits/route";
+import { checkAccess } from "../user/status/route";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
@@ -131,9 +131,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
 
-    const deducted = await deductCredit(session.user.email);
-    if (!deducted) {
-      return NextResponse.json({ error: "No credits remaining" }, { status: 403 });
+    // 检查用户是否已付费
+    const hasAccess = await checkAccess(session.user.email);
+    if (!hasAccess) {
+      return NextResponse.json({ error: "Payment required. Please purchase to continue." }, { status: 403 });
     }
 
     // 检测是否是执行顺序分析类代码

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
-import { addCredits } from '../../user/credits/route';
+import { activatePaid } from '../../user/status/route';
 import { pendingOrders } from './create-order/route';
 
 // 硬编码沙箱凭证（测试阶段）
@@ -52,13 +52,13 @@ export async function GET(request: Request) {
       const email = pendingOrders[orderId] || captureData.purchase_units?.[0]?.custom_id;
       
       if (email) {
-        // 自动添加积分（10个积分）
-        await addCredits(email, 10);
+        // 激活付费状态（终身制，无限使用）
+        await activatePaid(email);
         // 清理pending订单
         delete pendingOrders[orderId];
         
         const licenseKey = generateLicenseKey();
-        return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}&credits=10`);
+        return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}&paid=true`);
       } else {
         // 无法获取邮箱，显示license key让用户手动激活
         const licenseKey = generateLicenseKey();
