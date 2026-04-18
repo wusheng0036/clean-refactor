@@ -12,7 +12,14 @@ const PAYPAL_API = PAYPAL_MODE === 'live'
   : 'https://api.sandbox.paypal.com';
 
 // 内存存储临时订单关联（生产环境应使用Redis或数据库）
-const pendingOrders: Record<string, string> = {};
+declare global {
+  var pendingOrders: Record<string, string> | undefined;
+}
+
+const pendingOrders = globalThis.pendingOrders || {};
+if (!globalThis.pendingOrders) {
+  globalThis.pendingOrders = pendingOrders;
+}
 
 export async function POST(req: Request) {
   try {
@@ -83,5 +90,3 @@ export async function POST(req: Request) {
   }
 }
 
-// 导出pendingOrders供complete-payment使用
-export { pendingOrders };

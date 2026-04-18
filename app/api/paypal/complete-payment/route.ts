@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { activatePaid } from '../../user/status/route';
-import { pendingOrders } from './create-order/route';
+
+// 内存存储临时订单关联（与create-order共享）
+declare global {
+  var pendingOrders: Record<string, string> | undefined;
+}
+
+const pendingOrders = globalThis.pendingOrders || {};
+if (!globalThis.pendingOrders) {
+  globalThis.pendingOrders = pendingOrders;
+}
 
 // 硬编码沙箱凭证（测试阶段）
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'AVL437-aKd1dRmJiPzj_qOfEiZP12GngINf54ml5BySCpTP2j54Z_L-wqj7fy601rag0yxOxa5UyvezR';
