@@ -69,6 +69,7 @@ cb(null,{user:user,orders:o,total:total});
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // 获取用户付费状态
   useEffect(() => {
@@ -85,6 +86,12 @@ cb(null,{user:user,orders:o,total:total});
       if (res.ok) {
         const data = await res.json();
         setUserStatus(data);
+        // 如果是付费用户，显示欢迎弹窗
+        if (data.isPaid) {
+          setShowWelcome(true);
+          // 3秒后自动关闭
+          setTimeout(() => setShowWelcome(false), 5000);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch user status:", err);
@@ -189,6 +196,24 @@ cb(null,{user:user,orders:o,total:total});
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 md:p-8">
+      {/* 付费用户欢迎弹窗 */}
+      {showWelcome && isPaid && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-yellow-500 to-amber-600 p-8 rounded-2xl shadow-2xl max-w-md text-center animate-bounce">
+            <div className="text-6xl mb-4">👑</div>
+            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back, PRO Member!</h2>
+            <p className="text-white/90 mb-4">You have lifetime access to CleanRefactor AI.</p>
+            <div className="text-4xl font-bold text-white">⭐ PRO</div>
+            <button 
+              onClick={() => setShowWelcome(false)}
+              className="mt-6 px-6 py-2 bg-white text-amber-600 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+            >
+              Start Refactoring
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -198,9 +223,9 @@ cb(null,{user:user,orders:o,total:total});
           </div>
           <div className="flex items-center gap-4">
             {/* 付费状态显示 */}
-            <div className={`px-4 py-2 rounded-lg border ${isPaid ? 'bg-green-900/30 border-green-700' : 'bg-red-900/30 border-red-700'}`}>
+            <div className={`px-4 py-2 rounded-lg border ${isPaid ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500' : 'bg-red-900/30 border-red-700'}`}>
               <span className="text-gray-400 text-sm">Status: </span>
-              <span className={`font-bold ${isPaid ? 'text-green-400' : 'text-red-400'}`}>
+              <span className={`font-bold ${isPaid ? 'text-yellow-400' : 'text-red-400'}`}>
                 {isPaid ? '⭐ PRO' : 'Free'}
               </span>
             </div>
