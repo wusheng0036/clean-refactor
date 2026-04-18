@@ -39,9 +39,30 @@ export async function GET() {
 // 激活付费（支付后使用）
 export async function activatePaid(email: string): Promise<boolean> {
   try {
-    const user = await getUserByEmail(email);
+    console.log("Activating user:", email);
+    let user = await getUserByEmail(email);
+    console.log("Found user:", user);
+    
+    if (!user) {
+      // 用户不存在，创建新用户
+      console.log("Creating new user...");
+      const userId = crypto.randomUUID();
+      const createResult = await createUser({
+        id: userId,
+        email: email,
+        name: null,
+        provider: 'google',
+      });
+      console.log("Create user result:", createResult);
+      
+      // 重新获取用户
+      user = await getUserByEmail(email);
+      console.log("User after creation:", user);
+    }
+    
     if (user) {
-      await updateUserPaidStatus(user.id, true);
+      const updateResult = await updateUserPaidStatus(user.id, true);
+      console.log("Update paid status result:", updateResult);
       return true;
     }
     return false;
