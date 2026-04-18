@@ -27,7 +27,11 @@ export function HomeContent() {
       if (licenseFromBackend) setLicense(licenseFromBackend);
       if (paid) {
         setActivateStatus('success');
-        setActivateMessage('Payment successful! You now have lifetime access.');
+        setActivateMessage('🎉 Payment successful! You now have lifetime access.');
+        // 3秒后自动跳转到重构页面
+        setTimeout(() => {
+          window.location.href = '/refactor';
+        }, 3000);
       }
     } else if (params.get('canceled')) {
       setStatus('canceled');
@@ -418,18 +422,44 @@ export function HomeContent() {
           </div>
 
           {/* 状态处理 UI */}
-          {status === 'success' && license && (
-            <div style={{ background: '#ecfdf5', padding: '24px', borderRadius: '20px', marginBottom: '24px', border: '1px solid #10b981' }}>
-              <p style={{ fontWeight: 700, color: '#065f46', marginBottom: '12px' }}>🎉 Success! Your License Key:</p>
-              <div style={{ background: '#fff', padding: '12px', borderRadius: '12px', fontSize: '20px', fontWeight: 800, border: '2px dashed #10b981', color: '#0f172a' }}>
-                {license}
+          {status === 'success' && (
+            <div style={{ 
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
+              padding: '32px', 
+              borderRadius: '20px', 
+              marginBottom: '24px', 
+              color: '#fff',
+              textAlign: 'center',
+              boxShadow: '0 20px 40px -10px rgba(16, 185, 129, 0.4)'
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🎉</div>
+              <p style={{ fontWeight: 800, fontSize: '20px', marginBottom: '8px' }}>Payment Successful!</p>
+              <p style={{ fontSize: '16px', opacity: 0.95, marginBottom: '16px' }}>Welcome to CleanRefactor AI PRO</p>
+              <div style={{ 
+                background: 'rgba(255,255,255,0.2)', 
+                padding: '12px 20px', 
+                borderRadius: '12px',
+                display: 'inline-block',
+                marginBottom: '16px'
+              }}>
+                <span style={{ fontSize: '14px', opacity: 0.9 }}>License Key: </span>
+                <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '16px' }}>{license}</span>
               </div>
+              <p style={{ fontSize: '13px', opacity: 0.8 }}>Redirecting to app in 3 seconds...</p>
             </div>
           )}
           
           {status === 'error' && (
-            <div style={{ background: '#fef2f2', padding: '12px', borderRadius: '12px', marginBottom: '20px', color: '#991b1b', fontSize: '14px', fontWeight: 600 }}>
-              ❌ Payment failed. {payError && <span style={{fontSize: '12px', opacity: 0.8}}>({payError})</span>}
+            <div style={{ background: '#fef2f2', padding: '16px', borderRadius: '12px', marginBottom: '20px', color: '#991b1b', fontSize: '14px', fontWeight: 600, border: '2px solid #fecaca' }}>
+              <span style={{ fontSize: '18px', marginRight: '8px' }}>❌</span>
+              Payment failed. {payError && <span style={{fontSize: '12px', opacity: 0.8}}>({payError})</span>}
+            </div>
+          )}
+          
+          {status === 'canceled' && (
+            <div style={{ background: '#fffbeb', padding: '16px', borderRadius: '12px', marginBottom: '20px', color: '#92400e', fontSize: '14px', fontWeight: 600, border: '2px solid #fcd34d' }}>
+              <span style={{ fontSize: '18px', marginRight: '8px' }}>⚠️</span>
+              Payment canceled. You can try again anytime.
             </div>
           )}
 
@@ -449,28 +479,7 @@ export function HomeContent() {
             <span>30-Day Refund</span>
           </div>
 
-          {/* 支付成功信息 */}
-          {status === 'success' && (
-            <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
-              <div style={{ background: '#ecfdf5', padding: '16px', borderRadius: '12px', border: '1px solid #10b981' }}>
-                <p style={{ color: '#065f46', fontWeight: 600 }}>🎉 Payment Successful!</p>
-                <p style={{ color: '#047857', fontSize: '14px', marginTop: '4px' }}>You now have lifetime access to CleanRefactor AI.</p>
-                <Link href="/refactor" style={{
-                  display: 'inline-block',
-                  marginTop: '12px',
-                  background: '#10b981',
-                  color: '#fff',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                }}>
-                  Start Refactoring →
-                </Link>
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
 
