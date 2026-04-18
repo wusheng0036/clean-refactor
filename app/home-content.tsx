@@ -10,6 +10,7 @@ export function HomeContent() {
   const [status, setStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
   const [license, setLicense] = useState('');
   const [timer, setTimer] = useState('23:47:12');
+  const [payError, setPayError] = useState("");
 
   const PRICE = process.env.NEXT_PUBLIC_PRODUCT_PRICE || '14.99';
 
@@ -54,22 +55,25 @@ export function HomeContent() {
     if (loading) return;
     setLoading(true);
     setStatus('idle');
+    setPayError("");
     try {
       const res = await fetch('/api/paypal/create-order', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
-      if (!res.ok) throw new Error('API request failed');
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.details || data.error || 'API request failed');
+      }
       if (data.url) {
         window.location.href = data.url;
       } else {
         throw new Error('No redirect URL');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setStatus('error');
-      alert('Initialization failed. Please check your connection.');
+      setPayError(err.message);
     } finally {
       setLoading(false);
     }
@@ -384,7 +388,7 @@ export function HomeContent() {
           
           {status === 'error' && (
             <div style={{ background: '#fef2f2', padding: '12px', borderRadius: '12px', marginBottom: '20px', color: '#991b1b', fontSize: '14px', fontWeight: 600 }}>
-              ❌ Payment failed. Please try again.
+              ❌ Payment failed. {payError && <span style={{fontSize: '12px', opacity: 0.8}}>({payError})</span>}
             </div>
           )}
 

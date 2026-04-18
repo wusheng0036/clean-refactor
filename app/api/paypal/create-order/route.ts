@@ -12,6 +12,10 @@ const PAYPAL_API = PAYPAL_MODE === 'live'
 
 export async function POST() {
   try {
+    console.log('PayPal API:', PAYPAL_API);
+    console.log('Client ID exists:', !!PAYPAL_CLIENT_ID);
+    console.log('Client Secret exists:', !!PAYPAL_SECRET);
+    
     const basicAuth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64');
     const tokenRes = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
       method: 'POST',
@@ -22,7 +26,11 @@ export async function POST() {
       body: 'grant_type=client_credentials',
     });
 
-    if (!tokenRes.ok) throw new Error('Token Error');
+    if (!tokenRes.ok) {
+      const errorText = await tokenRes.text();
+      console.error('PayPal Token Error:', tokenRes.status, errorText);
+      throw new Error(`Token Error: ${tokenRes.status}`);
+    }
     const { access_token } = await tokenRes.json();
 
     const orderRes = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
@@ -49,10 +57,17 @@ export async function POST() {
     });
 
     const order = await orderRes.json();
-    const approvalUrl = order.links.find((l: any) => l.rel === 'approve')?.href;
+    console.log('PayPal Order created:', order.id);
+    const approvalUrl = order.links?.find((l: any) => l.rel === 'approve')?.href;
+    
+    if (!approvalUrl) {
+      console.error('No approval URL in order:', order);
+      throw new Error('No approval URL');
+    }
+    
     return NextResponse.json({ url: approvalUrl });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'Pay Error' }, { status: 500 });
+  } catch (err: any) {
+    console.error('PayPal Create Order Error:', err.message);
+    return NextResponse.json({ error: 'Pay Error', details: err.message }, { status: 500 });
   }
 }
