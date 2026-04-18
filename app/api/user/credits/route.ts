@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getUserByEmail } from "@/lib/d1";
 
 // 内存存储用户积分（测试阶段）
-const userCredits: Record<string, { credits: number; isPaid: boolean; hasUsedFreeTrial: boolean }> = {};
+const userCredits: Record<string, { credits: number; isPaid: boolean }> = {};
 
 export async function GET() {
   try {
@@ -14,12 +14,11 @@ export async function GET() {
 
     const email = session.user.email;
     
-    // 初始化用户积分（首次访问）
+    // 初始化用户（无免费试用，必须付费）
     if (!userCredits[email]) {
       userCredits[email] = {
-        credits: 3, // 免费试用3次
+        credits: 0, // 无免费额度
         isPaid: false,
-        hasUsedFreeTrial: false,
       };
     }
 
@@ -48,4 +47,16 @@ export async function activatePaid(email: string): Promise<void> {
   if (userCredits[email]) {
     userCredits[email].isPaid = true;
   }
+}
+
+// 添加积分（支付后使用）
+export async function addCredits(email: string, credits: number): Promise<void> {
+  if (!userCredits[email]) {
+    userCredits[email] = {
+      credits: 0,
+      isPaid: false,
+    };
+  }
+  userCredits[email].credits += credits;
+  userCredits[email].isPaid = true;
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
+import { addCredits } from '../../user/credits/route';
 
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET!;
@@ -44,6 +45,8 @@ export async function GET(request: Request) {
 
     const captureData = await captureRes.json();
     if (captureData.status === 'COMPLETED') {
+      // 从支付数据中获取用户邮箱（需要通过session或其他方式关联）
+      // 暂时使用license key方式，用户需要在页面输入license激活
       const licenseKey = generateLicenseKey();
       return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}`);
     } else {

@@ -212,8 +212,8 @@ cb(null,{user:user,orders:o,total:total});
         {!hasCredits && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
             <p className="text-red-300">
-              You have no credits remaining.
-              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Upgrade now →</Link>
+              You have no credits. Please purchase to continue.
+              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Buy Credits →</Link>
             </p>
           </div>
         )}
@@ -448,8 +448,8 @@ cb(null,{user:user,orders:o,total:total});
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-slate-800/50 rounded-lg">
-            <h3 className="text-white font-medium mb-2">🆓 Free Trial</h3>
-            <p className="text-gray-400 text-sm">3 free credits for new users</p>
+            <h3 className="text-white font-medium mb-2">💳 Pay Per Use</h3>
+            <p className="text-gray-400 text-sm">Purchase credits to use the tool</p>
           </div>
           <div className="p-4 bg-slate-800/50 rounded-lg">
             <h3 className="text-white font-medium mb-2">⚡ Fast Processing</h3>

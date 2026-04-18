@@ -11,6 +11,9 @@ export function HomeContent() {
   const [license, setLicense] = useState('');
   const [timer, setTimer] = useState('23:47:12');
   const [payError, setPayError] = useState("");
+  const [activateKey, setActivateKey] = useState('');
+  const [activateStatus, setActivateStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [activateMessage, setActivateMessage] = useState('');
 
   const PRICE = process.env.NEXT_PUBLIC_PRODUCT_PRICE || '14.99';
 
@@ -79,11 +82,43 @@ export function HomeContent() {
     }
   };
 
-  const handleTryFree = () => {
+  const handleStart = () => {
     if (session) {
       window.location.href = '/refactor';
     } else {
       signIn('google', { callbackUrl: '/refactor' });
+    }
+  };
+
+  const handleActivate = async () => {
+    if (!activateKey.trim() || !session?.user?.email) return;
+    
+    setActivateStatus('loading');
+    setActivateMessage('');
+    
+    try {
+      const res = await fetch('/api/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          licenseKey: activateKey.trim(),
+          email: session.user.email 
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setActivateStatus('success');
+        setActivateMessage(data.message || 'Activated successfully!');
+        setActivateKey('');
+      } else {
+        setActivateStatus('error');
+        setActivateMessage(data.error || 'Activation failed');
+      }
+    } catch (err: any) {
+      setActivateStatus('error');
+      setActivateMessage(err.message || 'Activation error');
     }
   };
 
@@ -293,9 +328,9 @@ export function HomeContent() {
         {/* CTA 按钮组 */}
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button 
-            onClick={handleTryFree}
+            onClick={handleStart}
             style={{
-              background: '#10b981',
+              background: '#2563eb',
               color: '#fff',
               padding: '14px 28px',
               borderRadius: '12px',
@@ -303,10 +338,10 @@ export function HomeContent() {
               fontSize: '16px',
               fontWeight: 700,
               cursor: 'pointer',
-              boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4)',
+              boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.4)',
             }}
           >
-            🚀 Try Free (3 Credits)
+            {sessionStatus === 'authenticated' ? '🚀 Start Refactoring' : '🔐 Login to Use'}
           </button>
           <button 
             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
@@ -325,7 +360,7 @@ export function HomeContent() {
           </button>
         </div>
         <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>
-          No credit card required for free trial
+          {sessionStatus === 'authenticated' ? 'Welcome back!' : 'Login required to use the tool'}
         </p>
       </div>
 
@@ -407,6 +442,51 @@ export function HomeContent() {
             <span>•</span>
             <span>30-Day Refund</span>
           </div>
+
+          {/* 激活码输入区域 */}
+          {sessionStatus === 'authenticated' && (
+            <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
+              <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '12px' }}>Already have a license key?</p>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={activateKey}
+                  onChange={(e) => setActivateKey(e.target.value)}
+                  placeholder="Enter license key"
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    fontSize: '14px',
+                  }}
+                />
+                <button
+                  onClick={handleActivate}
+                  disabled={activateStatus === 'loading' || !activateKey.trim()}
+                  style={{
+                    padding: '12px 20px',
+                    background: activateStatus === 'success' ? '#10b981' : '#2563eb',
+                    color: '#fff',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: activateStatus === 'loading' ? 'not-allowed' : 'pointer',
+                    opacity: activateStatus === 'loading' ? 0.7 : 1,
+                  }}
+                >
+                  {activateStatus === 'loading' ? 'Activating...' : 'Activate'}
+                </button>
+              </div>
+              {activateStatus === 'success' && (
+                <p style={{ color: '#10b981', fontSize: '13px', marginTop: '8px' }}>✅ {activateMessage}</p>
+              )}
+              {activateStatus === 'error' && (
+                <p style={{ color: '#ef4444', fontSize: '13px', marginTop: '8px' }}>❌ {activateMessage}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
