@@ -70,6 +70,7 @@ cb(null,{user:user,orders:o,total:total});
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [activating, setActivating] = useState(false);
 
   // 获取用户付费状态
   useEffect(() => {
@@ -98,6 +99,24 @@ cb(null,{user:user,orders:o,total:total});
     } finally {
       setStatusLoading(false);
     }
+  };
+
+  // 手动激活
+  const handleActivate = async () => {
+    setActivating(true);
+    try {
+      const res = await fetch('/api/test-activate', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        await fetchUserStatus(); // 刷新状态
+        alert('Activated! You can now use the tool.');
+      } else {
+        alert('Activation failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err: any) {
+      alert('Error: ' + err.message);
+    }
+    setActivating(false);
   };
 
   const handleRefactor = async () => {
@@ -243,10 +262,21 @@ cb(null,{user:user,orders:o,total:total});
         {/* 未付费提示 */}
         {!isPaid && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
-            <p className="text-red-300">
+            <p className="text-red-300 mb-3">
               Payment required to use this tool.
-              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Purchase Now →</Link>
             </p>
+            <div className="flex gap-3">
+              <Link href="/#pricing" className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors">
+                Purchase Now →
+              </Link>
+              <button
+                onClick={handleActivate}
+                disabled={activating}
+                className="inline-block bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-500 transition-colors disabled:opacity-50"
+              >
+                {activating ? 'Activating...' : '✅ I\'ve Paid - Activate'}
+              </button>
+            </div>
           </div>
         )}
 
