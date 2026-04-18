@@ -55,21 +55,25 @@ export async function GET(request: Request) {
     });
 
     const captureData = await captureRes.json();
+    console.log('PayPal capture data:', JSON.stringify(captureData, null, 2));
+    
     if (captureData.status === 'COMPLETED') {
-      // 从订单中获取用户邮箱
-      const orderId = captureData.id;
-      const email = pendingOrders[orderId] || captureData.purchase_units?.[0]?.custom_id;
+      // 从订单中获取用户邮箱（优先使用custom_id）
+      const customId = captureData.purchase_units?.[0]?.custom_id;
+      const email = customId;
+      
+      console.log('Custom ID from order:', customId);
+      console.log('Email to activate:', email);
       
       if (email) {
         // 激活付费状态（终身制，无限使用）
         await activatePaid(email);
-        // 清理pending订单
-        delete pendingOrders[orderId];
         
         const licenseKey = generateLicenseKey();
         return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}&paid=true`);
       } else {
         // 无法获取邮箱，显示license key让用户手动激活
+        console.log('No email found in custom_id');
         const licenseKey = generateLicenseKey();
         return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}`);
       }
