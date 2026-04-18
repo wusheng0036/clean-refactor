@@ -381,6 +381,28 @@ export function HomeContent() {
           >
             {sessionStatus === 'authenticated' ? '🚀 Start Refactoring' : '🔐 Login to Use'}
           </button>
+          
+          {/* 已支付用户快速激活 */}
+          {sessionStatus === 'authenticated' && status !== 'success' && (
+            <button 
+              onClick={handleManualActivate}
+              disabled={manualActivateLoading}
+              style={{
+                background: '#10b981',
+                color: '#fff',
+                padding: '14px 28px',
+                borderRadius: '12px',
+                border: 'none',
+                fontSize: '16px',
+                fontWeight: 700,
+                cursor: manualActivateLoading ? 'not-allowed' : 'pointer',
+                opacity: manualActivateLoading ? 0.7 : 1,
+                boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4)',
+              }}
+            >
+              {manualActivateLoading ? 'Activating...' : '✅ I\'ve Paid - Activate Now'}
+            </button>
+          )}
           <button 
             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             style={{
