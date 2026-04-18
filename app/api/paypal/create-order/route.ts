@@ -11,11 +11,16 @@ const PAYPAL_API = PAYPAL_MODE === 'live'
   ? 'https://api.paypal.com'
   : 'https://api.sandbox.paypal.com';
 
-export async function POST() {
+// 内存存储临时订单关联（生产环境应使用Redis或数据库）
+const pendingOrders: Record<string, string> = {};
+
+export async function POST(req: Request) {
   try {
-    console.log('PayPal API:', PAYPAL_API);
-    console.log('Client ID exists:', !!PAYPAL_CLIENT_ID);
-    console.log('Client Secret exists:', !!PAYPAL_SECRET);
+    const { email } = await req.json();
+    
+    if (!email) {
+      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+    }
     
     const basicAuth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64');
     const tokenRes = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
@@ -48,6 +53,7 @@ export async function POST() {
             value: PRICE,
           },
           description: 'CleanRefactor AI Lifetime License',
+          custom_id: email, // 将用户邮箱存入订单
         }],
         application_context: {
           return_url: `${SITE_URL}/api/paypal/complete-payment`,
@@ -59,6 +65,10 @@ export async function POST() {
 
     const order = await orderRes.json();
     console.log('PayPal Order created:', order.id);
+    
+    // 存储订单ID和用户邮箱的关联
+    pendingOrders[order.id] = email;
+    
     const approvalUrl = order.links?.find((l: any) => l.rel === 'approve')?.href;
     
     if (!approvalUrl) {
@@ -66,9 +76,12 @@ export async function POST() {
       throw new Error('No approval URL');
     }
     
-    return NextResponse.json({ url: approvalUrl });
+    return NextResponse.json({ url: approvalUrl, orderId: order.id });
   } catch (err: any) {
     console.error('PayPal Create Order Error:', err.message);
     return NextResponse.json({ error: 'Pay Error', details: err.message }, { status: 500 });
   }
 }
+
+// 导出pendingOrders供complete-payment使用
+export { pendingOrders };

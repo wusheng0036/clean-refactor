@@ -21,9 +21,14 @@ export function HomeContent() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const licenseFromBackend = params.get('license');
+    const creditsAdded = params.get('credits');
     if (params.get('success')) {
       setStatus('success');
       if (licenseFromBackend) setLicense(licenseFromBackend);
+      if (creditsAdded) {
+        setActivateStatus('success');
+        setActivateMessage(`Payment successful! ${creditsAdded} credits added to your account.`);
+      }
     } else if (params.get('canceled')) {
       setStatus('canceled');
     } else if (params.get('error')) {
@@ -62,7 +67,8 @@ export function HomeContent() {
     try {
       const res = await fetch('/api/paypal/create-order', { 
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: session?.user?.email })
       });
       const data = await res.json();
       if (!res.ok) {

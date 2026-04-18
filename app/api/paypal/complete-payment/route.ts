@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { addCredits } from '../../user/credits/route';
+import { pendingOrders } from './create-order/route';
 
 // 硬编码沙箱凭证（测试阶段）
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'AVL437-aKd1dRmJiPzj_qOfEiZP12GngINf54ml5BySCpTP2j54Z_L-wqj7fy601rag0yxOxa5UyvezR';
@@ -46,10 +47,23 @@ export async function GET(request: Request) {
 
     const captureData = await captureRes.json();
     if (captureData.status === 'COMPLETED') {
-      // 从支付数据中获取用户邮箱（需要通过session或其他方式关联）
-      // 暂时使用license key方式，用户需要在页面输入license激活
-      const licenseKey = generateLicenseKey();
-      return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}`);
+      // 从订单中获取用户邮箱
+      const orderId = captureData.id;
+      const email = pendingOrders[orderId] || captureData.purchase_units?.[0]?.custom_id;
+      
+      if (email) {
+        // 自动添加积分（10个积分）
+        await addCredits(email, 10);
+        // 清理pending订单
+        delete pendingOrders[orderId];
+        
+        const licenseKey = generateLicenseKey();
+        return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}&credits=10`);
+      } else {
+        // 无法获取邮箱，显示license key让用户手动激活
+        const licenseKey = generateLicenseKey();
+        return NextResponse.redirect(`${SITE_URL}/?success=true&license=${licenseKey}`);
+      }
     } else {
       return NextResponse.redirect(`${SITE_URL}/?error=true`);
     }
