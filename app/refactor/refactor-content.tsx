@@ -9,23 +9,53 @@ interface UserCredits {
   isPaid: boolean;
 }
 
+interface AnalysisItem {
+  category: string;
+  before: string;
+  after: string;
+}
+
+interface SuggestionItem {
+  priority: "high" | "medium" | "low";
+  issue: string;
+  recommendation: string;
+}
+
+interface AnalysisResult {
+  summary: string;
+  improvements: AnalysisItem[];
+  suggestions: SuggestionItem[];
+  score: { before: number; after: number };
+}
+
 export function RefactorContent() {
   const { data: session, status } = useSession();
-  const [code, setCode] = useState(`function calculateSum(arr) {
-  let sum = 0;
-  for (let i = 0; i < arr.length; i++) {
-    sum = sum + arr[i];
-  }
-  return sum;
+  const [code, setCode] = useState(`function getData(id,cb){
+db.query('select * from users where id='+id,function(e,u){
+if(e){cb(e);return;}
+if(u.length==0){cb('no user');return;}
+var user=u[0];
+db.query('select * from orders where uid='+user.id,function(e,o){
+if(e){cb(e);return;}
+var total=0;
+for(var i=0;i<o.length;i++){
+if(o[i].status==1){
+total+=o[i].amount;
+}
+}
+cb(null,{user:user,orders:o,total:total});
+});
+});
 }`);
   const [result, setResult] = useState("");
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
   const [userCredits, setUserCredits] = useState<UserCredits | null>(null);
   const [creditsLoading, setCreditsLoading] = useState(true);
 
-  // 获取用户积分
   useEffect(() => {
     if (session?.user?.email) {
       fetchUserCredits();
@@ -51,7 +81,6 @@ export function RefactorContent() {
   const handleRefactor = async () => {
     if (!code.trim()) return;
     
-    // 检查积分
     if (userCredits && userCredits.credits <= 0 && !userCredits.isPaid) {
       setError("No credits remaining. Please upgrade to continue.");
       return;
@@ -60,12 +89,13 @@ export function RefactorContent() {
     setLoading(true);
     setError("");
     setResult("");
+    setAnalysis(null);
     
     try {
       const res = await fetch("/api/refactor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, includeAnalysis: true }),
       });
       
       const data = await res.json();
@@ -74,7 +104,9 @@ export function RefactorContent() {
         setError(data.error || "Unknown error");
       } else {
         setResult(data.refactoredCode);
-        // 刷新积分
+        if (data.analysis) {
+          setAnalysis(data.analysis);
+        }
         fetchUserCredits();
       }
     } catch (error: any) {
@@ -84,7 +116,6 @@ export function RefactorContent() {
     setLoading(false);
   };
 
-  // 复制结果
   const handleCopy = async () => {
     if (!result) return;
     try {
@@ -96,14 +127,13 @@ export function RefactorContent() {
     }
   };
 
-  // 清除代码
   const handleClear = () => {
     setCode("");
     setResult("");
+    setAnalysis(null);
     setError("");
   };
 
-  // 未登录状态
   if (status === "unauthenticated") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-8">
@@ -124,7 +154,6 @@ export function RefactorContent() {
     );
   }
 
-  // 加载中
   if (status === "loading" || creditsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -138,56 +167,41 @@ export function RefactorContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* 头部 */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">AI Code Refactor</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              {session?.user?.email}
-            </p>
+            <p className="text-gray-400 text-sm mt-1">{session?.user?.email}</p>
           </div>
           <div className="flex items-center gap-4">
-            {/* 积分显示 */}
             <div className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
               <span className="text-gray-400 text-sm">Credits: </span>
               <span className={`font-bold ${hasCredits ? 'text-green-400' : 'text-red-400'}`}>
                 {userCredits?.credits ?? 0}
               </span>
-              {userCredits?.isPaid && (
-                <span className="ml-2 text-yellow-400 text-xs">⭐ PRO</span>
-              )}
+              {userCredits?.isPaid && <span className="ml-2 text-yellow-400 text-xs">⭐ PRO</span>}
             </div>
-            <Link 
-              href="/" 
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              ← Home
-            </Link>
+            <Link href="/" className="text-gray-400 hover:text-white transition-colors">← Home</Link>
           </div>
         </div>
 
-        {/* 无积分提示 */}
+        {/* No Credits Warning */}
         {!hasCredits && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
             <p className="text-red-300">
-              You have no credits remaining. 
-              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">
-                Upgrade now →
-              </Link>
+              You have no credits remaining.
+              <Link href="/#pricing" className="ml-2 text-blue-400 hover:underline">Upgrade now →</Link>
             </p>
           </div>
         )}
 
-        {/* 代码编辑器 - 左右平行布局 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          {/* 左侧：输入 */}
+        {/* Code Editors */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+          {/* Input */}
           <div className="flex flex-col">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white font-medium">Input Code</label>
-              <button
-                onClick={handleClear}
-                className="text-xs text-gray-400 hover:text-red-400 transition-colors flex items-center gap-1"
-              >
+              <button onClick={handleClear} className="text-xs text-gray-400 hover:text-red-400 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
@@ -197,66 +211,23 @@ export function RefactorContent() {
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="flex-1 min-h-[300px] md:min-h-[400px] bg-slate-800 text-white p-4 rounded-lg font-mono text-sm border border-slate-700 focus:border-blue-500 focus:outline-none resize-none"
+              className="flex-1 min-h-[250px] bg-slate-800 text-white p-4 rounded-lg font-mono text-sm border border-slate-700 focus:border-blue-500 focus:outline-none resize-none"
               placeholder="Paste your code here..."
             />
-            <button
-              onClick={handleRefactor}
-              disabled={loading || !hasCredits}
-              className="mt-4 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Processing...
-                </>
-              ) : hasCredits ? (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Refactor Code
-                </>
-              ) : (
-                "No Credits"
-              )}
-            </button>
           </div>
           
-          {/* 右侧：输出 */}
+          {/* Output */}
           <div className="flex flex-col">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white font-medium">Refactored Code</label>
               {result && (
-                <button
-                  onClick={handleCopy}
-                  className={`text-xs flex items-center gap-1 transition-colors ${
-                    copied ? 'text-green-400' : 'text-gray-400 hover:text-blue-400'
-                  }`}
-                >
-                  {copied ? (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      Copy
-                    </>
-                  )}
+                <button onClick={handleCopy} className={`text-xs flex items-center gap-1 ${copied ? 'text-green-400' : 'text-gray-400 hover:text-blue-400'}`}>
+                  {copied ? '✓ Copied!' : 'Copy'}
                 </button>
               )}
             </div>
             {error ? (
-              <div className="flex-1 min-h-[300px] md:min-h-[400px] bg-red-900/30 border border-red-700 text-red-300 p-4 rounded-lg font-mono text-sm overflow-auto">
+              <div className="flex-1 min-h-[250px] bg-red-900/30 border border-red-700 text-red-300 p-4 rounded-lg font-mono text-sm">
                 <p className="font-bold mb-2">Error:</p>
                 <p>{error}</p>
               </div>
@@ -264,17 +235,110 @@ export function RefactorContent() {
               <textarea
                 value={result}
                 readOnly
-                className="flex-1 min-h-[300px] md:min-h-[400px] bg-slate-800 text-green-400 p-4 rounded-lg font-mono text-sm border border-slate-700 resize-none"
+                className="flex-1 min-h-[250px] bg-slate-800 text-green-400 p-4 rounded-lg font-mono text-sm border border-slate-700 resize-none"
                 placeholder="Refactored code will appear here..."
               />
             )}
-            {/* 占位按钮保持对齐 */}
-            <div className="mt-4 h-[50px]" />
           </div>
         </div>
 
-        {/* 使用说明 */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Action Button */}
+        <button
+          onClick={handleRefactor}
+          disabled={loading || !hasCredits}
+          className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 mb-6"
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Processing...
+            </>
+          ) : hasCredits ? (
+            <>⚡ Refactor Code</>
+          ) : (
+            "No Credits"
+          )}
+        </button>
+
+        {/* Analysis Section */}
+        {analysis && (
+          <div className="bg-slate-800/50 rounded-lg p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">📊 Code Review Analysis</h2>
+              <button onClick={() => setShowAnalysis(!showAnalysis)} className="text-sm text-blue-400 hover:text-blue-300">
+                {showAnalysis ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            
+            {/* Score */}
+            <div className="flex gap-4 mb-4">
+              <div className="bg-red-900/30 px-4 py-2 rounded-lg">
+                <span className="text-gray-400 text-sm">Before: </span>
+                <span className="text-red-400 font-bold text-xl">{analysis.score?.before}/10</span>
+              </div>
+              <div className="text-gray-500 text-2xl">→</div>
+              <div className="bg-green-900/30 px-4 py-2 rounded-lg">
+                <span className="text-gray-400 text-sm">After: </span>
+                <span className="text-green-400 font-bold text-xl">{analysis.score?.after}/10</span>
+              </div>
+            </div>
+
+            <p className="text-gray-300 mb-4">{analysis.summary}</p>
+
+            {showAnalysis && (
+              <>
+                {/* Improvements */}
+                {analysis.improvements && analysis.improvements.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-white font-medium mb-2">✅ Key Improvements</h3>
+                    <div className="space-y-2">
+                      {analysis.improvements.map((item, idx) => (
+                        <div key={idx} className="bg-slate-700/50 p-3 rounded-lg">
+                          <span className="text-blue-400 text-sm font-medium">{item.category}: </span>
+                          <span className="text-red-400 text-sm line-through">{item.before}</span>
+                          <span className="text-gray-500 mx-2">→</span>
+                          <span className="text-green-400 text-sm">{item.after}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Suggestions */}
+                {analysis.suggestions && analysis.suggestions.length > 0 && (
+                  <div>
+                    <h3 className="text-white font-medium mb-2">💡 Further Suggestions</h3>
+                    <div className="space-y-2">
+                      {analysis.suggestions.map((item, idx) => (
+                        <div key={idx} className={`p-3 rounded-lg border ${
+                          item.priority === 'high' ? 'bg-red-900/20 border-red-700' :
+                          item.priority === 'medium' ? 'bg-yellow-900/20 border-yellow-700' :
+                          'bg-blue-900/20 border-blue-700'
+                        }`}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                              item.priority === 'high' ? 'bg-red-600' :
+                              item.priority === 'medium' ? 'bg-yellow-600' :
+                              'bg-blue-600'
+                            } text-white`}>{item.priority.toUpperCase()}</span>
+                            <span className="text-gray-300 text-sm">{item.issue}</span>
+                          </div>
+                          <p className="text-gray-400 text-sm ml-14">{item.recommendation}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-slate-800/50 rounded-lg">
             <h3 className="text-white font-medium mb-2">🆓 Free Trial</h3>
             <p className="text-gray-400 text-sm">3 free credits for new users</p>
