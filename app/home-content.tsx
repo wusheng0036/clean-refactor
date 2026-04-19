@@ -617,15 +617,57 @@ export function HomeContent() {
               )}
               
               {activateStatus === 'success' && (
-                <div style={{ 
-                  background: 'rgba(255,255,255,0.2)', 
-                  padding: '16px', 
-                  borderRadius: '12px',
-                  marginBottom: '12px'
-                }}>
-                  <span style={{ fontSize: '20px', marginRight: '8px' }}>✅</span>
-                  <span style={{ fontSize: '16px', fontWeight: 600 }}>{activateMessage}</span>
-                </div>
+                <>
+                  <div style={{ 
+                    background: 'rgba(255,255,255,0.2)', 
+                    padding: '20px', 
+                    borderRadius: '12px',
+                    marginBottom: '16px'
+                  }}>
+                    <div style={{ fontSize: '48px', marginBottom: '8px' }}>✅</div>
+                    <p style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>Account Activated!</p>
+                    <p style={{ fontSize: '14px', opacity: 0.9 }}>{activateMessage}</p>
+                  </div>
+                  
+                  {/* 订单详情 */}
+                  <div style={{ 
+                    background: 'rgba(255,255,255,0.15)', 
+                    padding: '16px', 
+                    borderRadius: '12px',
+                    marginBottom: '20px',
+                    textAlign: 'left'
+                  }}>
+                    <p style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '8px' }}>Order Details</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
+                      <span>Product:</span>
+                      <span>Lifetime License</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
+                      <span>Price:</span>
+                      <span>${PRICE}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                      <span>Status:</span>
+                      <span style={{ color: '#86efac' }}>✓ Active</span>
+                    </div>
+                  </div>
+                  
+                  {/* 立即使用按钮 */}
+                  <Link href="/refactor" style={{
+                    display: 'inline-block',
+                    background: '#fff',
+                    color: '#059669',
+                    padding: '16px 32px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2)',
+                    transition: 'transform 0.2s',
+                  }}>
+                    🚀 Start Using Now
+                  </Link>
+                </>
               )}
               
               {/* 自动激活失败时显示手动激活按钮 */}
