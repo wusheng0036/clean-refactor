@@ -500,21 +500,6 @@ export function HomeContent() {
               {manualActivateLoading ? 'Activating...' : '✅ I\'ve Paid - Activate Now'}
             </button>
           )}
-          <button 
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-            style={{
-              background: '#fff',
-              color: '#2563eb',
-              padding: '14px 28px',
-              borderRadius: '12px',
-              border: '2px solid #2563eb',
-              fontSize: '16px',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            View Pricing
-          </button>
         </div>
         <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>
           {sessionStatus === 'authenticated' ? 'Welcome back!' : 'Login required to use the tool'}
