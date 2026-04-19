@@ -107,16 +107,22 @@ Output format:
 
 // 检测是否是执行顺序分析类代码（面试题风格）
 function isExecutionTraceCode(code: string): boolean {
+  // 如果代码包含"输出顺序"、"执行顺序"等关键词，直接认为是分析题
+  if (/输出顺序|执行顺序|predictedOrder|event loop|微任务|宏任务/i.test(code)) {
+    return true;
+  }
+  
   const patterns = [
     /console\.log\s*\(/g,           // 包含 console.log
     /setTimeout\s*\(/g,             // 包含 setTimeout
-    /Promise\.(resolve|reject)\s*\(/g, // 包含 Promise
+    /Promise\.(resolve|reject)/g,   // 包含 Promise
     /async\s+function/g,            // 包含 async 函数
     /await\s+/g,                    // 包含 await
   ];
   
   const matches = patterns.filter(p => p.test(code)).length;
-  return matches >= 4; // 至少匹配4个模式才认为是执行顺序分析题
+  console.log('[Refactor API] Pattern matches:', matches);
+  return matches >= 3; // 至少匹配3个模式就认为是执行顺序分析题
 }
 
 export async function POST(req: Request) {
