@@ -172,7 +172,8 @@ export function HomeContent() {
         document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      // 未登录，先登录
+      // 未登录，提示并跳转登录
+      alert('请先登录');
       signIn('google', { callbackUrl: '/refactor' });
     }
   };
@@ -406,7 +407,7 @@ export function HomeContent() {
                   fontSize: '14px',
                   fontWeight: 600,
                 }}>
-                  Start Refactoring
+                  开始重构
                 </Link>
               ) : (
                 <button 
@@ -422,7 +423,7 @@ export function HomeContent() {
                     cursor: 'pointer',
                   }}
                 >
-                  💎 Upgrade PRO
+                  支付
                 </button>
               )}
             </>
@@ -475,12 +476,7 @@ export function HomeContent() {
               boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.4)',
             }}
           >
-            {checkingPayment 
-              ? 'Loading...' 
-              : sessionStatus === 'authenticated' 
-                ? (isPaid ? '🚀 Start Refactoring' : '💎 Upgrade to PRO')
-                : '🔐 Login to Use'
-            }
+            {checkingPayment ? 'Loading...' : '🚀 开始重构'}
           </button>
           
           {/* 已支付用户快速激活 */}
