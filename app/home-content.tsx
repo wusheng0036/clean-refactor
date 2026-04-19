@@ -15,8 +15,32 @@ export function HomeContent() {
   const [activateStatus, setActivateStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [activateMessage, setActivateMessage] = useState('');
   const [manualActivateLoading, setManualActivateLoading] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(true);
 
   const PRICE = process.env.NEXT_PUBLIC_PRODUCT_PRICE || '14.99';
+
+  // 检查用户付费状态
+  useEffect(() => {
+    const checkPaymentStatus = async () => {
+      if (sessionStatus === 'authenticated' && session?.user?.email) {
+        try {
+          const res = await fetch('/api/user/status');
+          if (res.ok) {
+            const data = await res.json();
+            setIsPaid(data.isPaid === true);
+          }
+        } catch (err) {
+          console.error('Payment check failed:', err);
+        }
+      }
+      setCheckingPayment(false);
+    };
+
+    if (sessionStatus !== 'loading') {
+      checkPaymentStatus();
+    }
+  }, [sessionStatus, session]);
 
   // 处理 URL 状态回调
   useEffect(() => {
@@ -139,9 +163,16 @@ export function HomeContent() {
   };
 
   const handleStart = () => {
-    if (session) {
-      window.location.href = '/refactor';
+    if (sessionStatus === 'authenticated') {
+      if (isPaid) {
+        // 已付费，跳转到工作页面
+        window.location.href = '/refactor';
+      } else {
+        // 已登录但未付费，跳转到定价页面
+        document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+      }
     } else {
+      // 未登录，先登录
       signIn('google', { callbackUrl: '/refactor' });
     }
   };
@@ -365,17 +396,35 @@ export function HomeContent() {
           {sessionStatus === 'authenticated' ? (
             <>
               <span style={{ color: '#64748b', fontSize: '14px' }}>{session?.user?.email}</span>
-              <Link href="/refactor" style={{
-                background: '#2563eb',
-                color: '#fff',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: 600,
-              }}>
-                Start Refactoring
-              </Link>
+              {isPaid ? (
+                <Link href="/refactor" style={{
+                  background: '#2563eb',
+                  color: '#fff',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                }}>
+                  Start Refactoring
+                </Link>
+              ) : (
+                <button 
+                  onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                  style={{
+                    background: '#10b981',
+                    color: '#fff',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  💎 Upgrade PRO
+                </button>
+              )}
             </>
           ) : (
             <button 
@@ -412,6 +461,7 @@ export function HomeContent() {
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button 
             onClick={handleStart}
+            disabled={checkingPayment}
             style={{
               background: '#2563eb',
               color: '#fff',
@@ -420,11 +470,17 @@ export function HomeContent() {
               border: 'none',
               fontSize: '16px',
               fontWeight: 700,
-              cursor: 'pointer',
+              cursor: checkingPayment ? 'not-allowed' : 'pointer',
+              opacity: checkingPayment ? 0.7 : 1,
               boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.4)',
             }}
           >
-            {sessionStatus === 'authenticated' ? '🚀 Start Refactoring' : '🔐 Login to Use'}
+            {checkingPayment 
+              ? 'Loading...' 
+              : sessionStatus === 'authenticated' 
+                ? (isPaid ? '🚀 Start Refactoring' : '💎 Upgrade to PRO')
+                : '🔐 Login to Use'
+            }
           </button>
           
           {/* 已支付用户快速激活 */}
