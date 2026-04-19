@@ -196,7 +196,7 @@ export async function POST(req: Request) {
       return NextResponse.json({
         refactoredCode: code, // 原样返回
         executionTrace,
-        mode: "execution-trace",
+        mode: "execution-trace-v2", // 标记版本
         model: traceData.model,
         usage: traceData.usage,
       });
@@ -265,7 +265,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       refactoredCode,
       analysis,
-      mode: "refactor",
+      mode: "refactor-v2",
       model: refactorData.model,
       usage: refactorData.usage,
     });
