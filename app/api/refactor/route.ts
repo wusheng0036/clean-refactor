@@ -121,18 +121,27 @@ function isExecutionTraceCode(code: string): boolean {
 
 export async function POST(req: Request) {
   try {
+    console.log("[Refactor API] Starting request...");
+    
     const session = await auth();
+    console.log("[Refactor API] Auth session:", session?.user?.email);
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { code, includeAnalysis = false } = await req.json();
+    console.log("[Refactor API] Code length:", code?.length);
+    
     if (!code) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
 
     // 检查用户是否已付费
+    console.log("[Refactor API] Checking access for:", session.user.email);
     const hasAccess = await checkAccess(session.user.email);
+    console.log("[Refactor API] Access result:", hasAccess);
+    
     if (!hasAccess) {
       return NextResponse.json({ error: "Payment required. Please purchase to continue." }, { status: 403 });
     }
@@ -252,7 +261,11 @@ export async function POST(req: Request) {
       usage: refactorData.usage,
     });
   } catch (err: any) {
-    console.error("Refactor error:", err);
-    return NextResponse.json({ error: err.message || "Server error" }, { status: 500 });
+    console.error("[Refactor API] Error:", err);
+    console.error("[Refactor API] Stack:", err.stack);
+    return NextResponse.json({ 
+      error: err.message || "Server error",
+      stack: err.stack 
+    }, { status: 500 });
   }
 }
