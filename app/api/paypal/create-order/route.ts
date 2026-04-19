@@ -63,14 +63,14 @@ export async function POST(req: Request) {
           custom_id: email, // 将用户邮箱存入订单
         }],
         application_context: {
-          return_url: `${SITE_URL}/api/paypal/complete-payment?oid=${order.id}`,
+          return_url: `${SITE_URL}/api/paypal/complete-payment`,
           cancel_url: `${SITE_URL}/?canceled=true`,
           shipping_preference: 'NO_SHIPPING',
         },
       }),
     });
 
-    const order = await orderRes.json();
+    const order: any = await orderRes.json();
     console.log('PayPal Order created:', order.id);
     
     // 存储订单ID和用户邮箱的关联
