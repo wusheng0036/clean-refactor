@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     }
     const { access_token } = await tokenRes.json();
 
-    const orderRes = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
+    const orderRes: Response = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${access_token}`,
