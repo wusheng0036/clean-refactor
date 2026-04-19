@@ -118,7 +118,15 @@ function RefactorPageInner() {
         {/* Code Editors */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="text-white font-medium block mb-2">Input Code</label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-white font-medium">Input Code</label>
+              <button
+                onClick={() => setCode('')}
+                className="text-xs text-gray-400 hover:text-red-400"
+              >
+                Clear
+              </button>
+            </div>
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -127,7 +135,16 @@ function RefactorPageInner() {
             />
           </div>
           <div>
-            <label className="text-white font-medium block mb-2">Refactored Code</label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-white font-medium">Refactored Code</label>
+              <button
+                onClick={() => navigator.clipboard.writeText(result)}
+                className="text-xs text-gray-400 hover:text-blue-400"
+                disabled={!result}
+              >
+                Copy
+              </button>
+            </div>
             <textarea
               value={result}
               readOnly
