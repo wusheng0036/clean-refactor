@@ -127,7 +127,7 @@ function isExecutionTraceCode(code: string): boolean {
 
 export async function POST(req: Request) {
   try {
-    console.log("[Refactor API] Starting request...");
+    console.log("[Refactor API v2] Starting request...");
     
     const session = await auth();
     console.log("[Refactor API] Auth session:", session?.user?.email);
