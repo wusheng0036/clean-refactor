@@ -24,12 +24,16 @@ function RefactorPageInner() {
   const checkStatus = async () => {
     try {
       const res = await fetch('/api/user/status');
+      console.log('Status check response:', res.status);
       if (res.ok) {
         const data = await res.json();
+        console.log('Status data:', data);
         setIsPaid(data.isPaid);
+      } else {
+        console.error('Status check failed:', res.status);
       }
     } catch (err) {
-      console.error('Status check failed:', err);
+      console.error('Status check error:', err);
     } finally {
       setChecking(false);
     }
