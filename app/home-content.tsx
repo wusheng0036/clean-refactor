@@ -27,12 +27,8 @@ export function HomeContent() {
       setStatus('success');
       if (licenseFromBackend) setLicense(licenseFromBackend);
       if (paid) {
-        setActivateStatus('success');
-        setActivateMessage('🎉 Payment successful! You now have lifetime access.');
-        // 3秒后自动跳转到重构页面
-        setTimeout(() => {
-          window.location.href = '/refactor';
-        }, 3000);
+        // 自动激活付费状态
+        handleAutoActivate();
       }
     } else if (params.get('canceled')) {
       setStatus('canceled');
@@ -40,6 +36,55 @@ export function HomeContent() {
       setStatus('error');
     }
   }, []);
+
+  // 自动激活（支付成功后调用）
+  const handleAutoActivate = async () => {
+    setActivateStatus('loading');
+    setActivateMessage('Activating your account...');
+    
+    try {
+      // 尝试激活，最多重试3次
+      let attempts = 0;
+      let success = false;
+      
+      while (attempts < 3 && !success) {
+        attempts++;
+        console.log(`Auto activation attempt ${attempts}...`);
+        
+        const res = await fetch('/api/test-activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          success = true;
+          setActivateStatus('success');
+          setActivateMessage('🎉 Payment successful! Redirecting to app...');
+          // 2秒后自动跳转到重构页面
+          setTimeout(() => {
+            window.location.href = '/refactor';
+          }, 2000);
+        } else {
+          console.log(`Activation attempt ${attempts} failed:`, data.error);
+          if (attempts < 3) {
+            // 等待1秒后重试
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+      }
+      
+      if (!success) {
+        // 自动激活失败，显示手动激活按钮
+        setActivateStatus('error');
+        setActivateMessage('Auto-activation failed. Please click the button below to activate manually.');
+      }
+    } catch (err: any) {
+      console.error('Auto activation error:', err);
+      setActivateStatus('error');
+      setActivateMessage('Activation error. Please try clicking the activate button below.');
+    }
+  };
 
   // 修复倒计时逻辑：基于函数式更新
   useEffect(() => {
@@ -486,30 +531,77 @@ export function HomeContent() {
               <p style={{ fontWeight: 800, fontSize: '20px', marginBottom: '8px' }}>Payment Successful!</p>
               <p style={{ fontSize: '16px', opacity: 0.95, marginBottom: '16px' }}>Welcome to CleanRefactor AI PRO</p>
               
-              <button
-                onClick={handleManualActivate}
-                disabled={manualActivateLoading}
-                style={{
-                  background: '#fff',
-                  color: '#059669',
-                  padding: '14px 28px',
+              {/* 自动激活状态显示 */}
+              {activateStatus === 'loading' && (
+                <div style={{ 
+                  background: 'rgba(255,255,255,0.2)', 
+                  padding: '16px', 
                   borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  cursor: manualActivateLoading ? 'not-allowed' : 'pointer',
-                  opacity: manualActivateLoading ? 0.7 : 1,
-                  marginBottom: '12px',
-                }}
-              >
-                {manualActivateLoading ? 'Activating...' : '✅ Click to Activate'}
-              </button>
+                  marginBottom: '12px'
+                }}>
+                  <div style={{ 
+                    display: 'inline-block', 
+                    width: '20px', 
+                    height: '20px', 
+                    border: '3px solid rgba(255,255,255,0.3)', 
+                    borderTop: '3px solid #fff', 
+                    borderRadius: '50%', 
+                    animation: 'spin 1s linear infinite',
+                    marginRight: '10px',
+                    verticalAlign: 'middle'
+                  }} />
+                  <span style={{ fontSize: '16px', fontWeight: 600 }}>{activateMessage}</span>
+                  <style>{`
+                    @keyframes spin {
+                      0% { transform: rotate(0deg); }
+                      100% { transform: rotate(360deg); }
+                    }
+                  `}</style>
+                </div>
+              )}
               
               {activateStatus === 'success' && (
-                <p style={{ color: '#fff', fontSize: '14px' }}>{activateMessage}</p>
+                <div style={{ 
+                  background: 'rgba(255,255,255,0.2)', 
+                  padding: '16px', 
+                  borderRadius: '12px',
+                  marginBottom: '12px'
+                }}>
+                  <span style={{ fontSize: '20px', marginRight: '8px' }}>✅</span>
+                  <span style={{ fontSize: '16px', fontWeight: 600 }}>{activateMessage}</span>
+                </div>
               )}
+              
+              {/* 自动激活失败时显示手动激活按钮 */}
               {activateStatus === 'error' && (
-                <p style={{ color: '#fecaca', fontSize: '14px' }}>{activateMessage}</p>
+                <>
+                  <div style={{ 
+                    background: 'rgba(239,68,68,0.3)', 
+                    padding: '12px', 
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    fontSize: '14px'
+                  }}>
+                    {activateMessage}
+                  </div>
+                  <button
+                    onClick={handleManualActivate}
+                    disabled={manualActivateLoading}
+                    style={{
+                      background: '#fff',
+                      color: '#059669',
+                      padding: '14px 28px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      cursor: manualActivateLoading ? 'not-allowed' : 'pointer',
+                      opacity: manualActivateLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {manualActivateLoading ? 'Activating...' : '✅ Click to Activate'}
+                  </button>
+                </>
               )}
             </div>
           )}
