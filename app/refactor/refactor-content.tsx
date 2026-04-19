@@ -87,12 +87,6 @@ cb(null,{user:user,orders:o,total:total});
       if (res.ok) {
         const data = await res.json();
         setUserStatus(data);
-        // 如果是付费用户，显示欢迎弹窗
-        if (data.isPaid) {
-          setShowWelcome(true);
-          // 3秒后自动关闭
-          setTimeout(() => setShowWelcome(false), 5000);
-        }
       }
     } catch (err) {
       console.error("Failed to fetch user status:", err);
