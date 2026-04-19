@@ -14,12 +14,12 @@ function RefactorPageInner() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (session?.user?.email) {
+    if (status === 'authenticated' && session?.user?.email) {
       checkStatus();
-    } else {
+    } else if (status !== 'loading') {
       setChecking(false);
     }
-  }, [session]);
+  }, [status, session]);
 
   const checkStatus = async () => {
     try {
@@ -28,12 +28,14 @@ function RefactorPageInner() {
       if (res.ok) {
         const data = await res.json();
         console.log('Status data:', data);
-        setIsPaid(data.isPaid);
+        setIsPaid(data.isPaid === true);
       } else {
         console.error('Status check failed:', res.status);
+        setIsPaid(false);
       }
     } catch (err) {
       console.error('Status check error:', err);
+      setIsPaid(false);
     } finally {
       setChecking(false);
     }
