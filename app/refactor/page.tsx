@@ -14,32 +14,28 @@ function RefactorPageInner() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.email) {
-      checkStatus();
-    } else if (status !== 'loading') {
+    const checkUserStatus = async () => {
+      if (status === 'authenticated' && session?.user?.email) {
+        try {
+          const res = await fetch('/api/user/status');
+          if (res.ok) {
+            const data = await res.json();
+            console.log('Setting isPaid to:', data.isPaid);
+            setIsPaid(data.isPaid === true);
+          }
+        } catch (err) {
+          console.error('Status check failed:', err);
+        }
+      }
       setChecking(false);
+    };
+    
+    if (status !== 'loading') {
+      checkUserStatus();
     }
   }, [status, session]);
 
-  const checkStatus = async () => {
-    try {
-      const res = await fetch('/api/user/status');
-      console.log('Status check response:', res.status);
-      if (res.ok) {
-        const data = await res.json();
-        console.log('Status data:', data);
-        setIsPaid(data.isPaid === true);
-      } else {
-        console.error('Status check failed:', res.status);
-        setIsPaid(false);
-      }
-    } catch (err) {
-      console.error('Status check error:', err);
-      setIsPaid(false);
-    } finally {
-      setChecking(false);
-    }
-  };
+
 
   const handleRefactor = async () => {
     if (!code.trim()) return;
