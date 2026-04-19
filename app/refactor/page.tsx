@@ -10,7 +10,7 @@ function RefactorPageInner() {
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isPaid, setIsPaid] = useState(false);
+  const [isPaid, setIsPaid] = useState(true); // Force PRO status for testing
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
