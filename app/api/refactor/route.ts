@@ -148,6 +148,7 @@ export async function POST(req: Request) {
 
     // 检测是否是执行顺序分析类代码
     const isTraceMode = isExecutionTraceCode(code);
+    console.log('[Refactor API] isTraceMode:', isTraceMode);
 
     if (isTraceMode) {
       // 执行顺序分析模式
@@ -175,11 +176,13 @@ export async function POST(req: Request) {
 
       const traceData = await traceRes.json();
       const traceText = traceData.choices?.[0]?.message?.content || "";
+      console.log('[Refactor API] traceText:', traceText.substring(0, 200));
       
       let executionTrace = null;
       try {
         const jsonMatch = traceText.match(/\{[\s\S]*\}/);
         executionTrace = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+        console.log('[Refactor API] executionTrace parsed:', !!executionTrace);
       } catch (e) {
         console.error("Failed to parse execution trace:", e);
       }

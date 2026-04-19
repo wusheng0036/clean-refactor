@@ -12,6 +12,8 @@ function RefactorPageInner() {
   const [error, setError] = useState('');
   const [isPaid, setIsPaid] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [executionTrace, setExecutionTrace] = useState<any>(null);
+  const [mode, setMode] = useState<'refactor' | 'execution-trace'>('refactor');
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -61,6 +63,8 @@ function RefactorPageInner() {
         setError(data.error || 'Request failed');
       } else {
         setResult(data.refactoredCode || '');
+        setMode(data.mode || 'refactor');
+        setExecutionTrace(data.executionTrace || null);
       }
     } catch (err: any) {
       setError(err.message || 'Error');
@@ -164,6 +168,29 @@ function RefactorPageInner() {
         >
           {loading ? 'Processing...' : isPaid ? '⚡ Refactor Code' : '🔒 Purchase Required'}
         </button>
+
+        {/* Execution Trace Analysis */}
+        {mode === 'execution-trace' && executionTrace && (
+          <div className="mt-6 bg-slate-800/50 rounded-lg p-6">
+            <h2 className="text-xl font-bold text-white mb-4">🔍 Execution Order Analysis</h2>
+            
+            {/* Predicted Order */}
+            <div className="mb-4">
+              <h3 className="text-white font-medium mb-2">Predicted Output Order:</h3>
+              <div className="bg-slate-900 p-4 rounded-lg font-mono text-sm text-green-400">
+                {executionTrace.predictedOrder?.join(' → ')}
+              </div>
+            </div>
+
+            {/* Key Insight */}
+            {executionTrace.keyInsight && (
+              <div className="bg-purple-900/30 p-4 rounded-lg border border-purple-700">
+                <h3 className="text-purple-400 font-medium mb-1">💡 Key Insight:</h3>
+                <p className="text-gray-300 text-sm">{executionTrace.keyInsight}</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
