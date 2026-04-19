@@ -50,7 +50,6 @@ export async function activatePaid(email: string): Promise<boolean> {
       const createResult = await createUser({
         id: userId,
         email: email,
-        name: null,
         provider: 'google',
       });
       console.log("Create user result:", createResult);
