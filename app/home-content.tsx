@@ -407,7 +407,7 @@ export function HomeContent() {
                   fontSize: '14px',
                   fontWeight: 600,
                 }}>
-                  开始重构
+                  Dashboard
                 </Link>
               ) : (
                 <button 
@@ -423,7 +423,7 @@ export function HomeContent() {
                     cursor: 'pointer',
                   }}
                 >
-                  支付
+                  Upgrade
                 </button>
               )}
             </>
@@ -476,30 +476,9 @@ export function HomeContent() {
               boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.4)',
             }}
           >
-            {checkingPayment ? 'Loading...' : '🚀 开始重构'}
+            {checkingPayment ? 'Loading...' : '🚀 Start Refactoring'}
           </button>
           
-          {/* 已支付用户快速激活 */}
-          {sessionStatus === 'authenticated' && status !== 'success' && (
-            <button 
-              onClick={handleManualActivate}
-              disabled={manualActivateLoading}
-              style={{
-                background: '#10b981',
-                color: '#fff',
-                padding: '14px 28px',
-                borderRadius: '12px',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: 700,
-                cursor: manualActivateLoading ? 'not-allowed' : 'pointer',
-                opacity: manualActivateLoading ? 0.7 : 1,
-                boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4)',
-              }}
-            >
-              {manualActivateLoading ? 'Activating...' : '✅ I\'ve Paid - Activate Now'}
-            </button>
-          )}
         </div>
         <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>
           {sessionStatus === 'authenticated' ? 'Welcome back!' : 'Login required to use the tool'}
