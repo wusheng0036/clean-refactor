@@ -56,11 +56,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
 
-    // 检查用户是否已付费
-    const hasAccess = await checkAccess(session.user.email);
-    if (!hasAccess) {
-      return NextResponse.json({ error: "Payment required" }, { status: 403 });
-    }
+    // 检查用户是否已付费 - 临时跳过，测试 auth
+    // const hasAccess = await checkAccess(session.user.email);
+    // if (!hasAccess) {
+    //   return NextResponse.json({ error: "Payment required" }, { status: 403 });
+    // }
 
     const isTraceMode = isExecutionTraceCode(code);
     
