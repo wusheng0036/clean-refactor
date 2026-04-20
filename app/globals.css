@@ -21,3 +21,13 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Shimmer animation for loading bar */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}

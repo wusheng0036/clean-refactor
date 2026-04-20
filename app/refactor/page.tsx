@@ -206,6 +206,27 @@ console.log('4');
         </div>
       </header>
 
+      {/* Full-screen Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-[#13131a] border border-slate-700 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-slate-700 border-t-purple-500 rounded-full animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Zap className="w-6 h-6 text-purple-400" />
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-white mb-1">AI Refactoring...</h3>
+              <p className="text-sm text-slate-400">This may take 10-30 seconds</p>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full animate-[shimmer_2s_infinite] w-1/2" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Logo & Title - Centered, Large */}
         <div className="flex justify-center mb-4">
