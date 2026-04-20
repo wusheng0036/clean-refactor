@@ -5,8 +5,8 @@ import { checkAccess } from "../user/status/route";
 // 硬编码硅基流动配置（测试用）
 const OPENAI_API_KEY = "sk-guqeqlonpyeeimztakfxnnztwwizbjhduabgggscbicjqyxz";
 const OPENAI_BASE_URL = "https://api.siliconflow.cn/v1";
-// 改用更快的 Qwen 模型
-const MODEL = "Qwen/Qwen2.5-7B-Instruct";
+// 试试 DeepSeek 今天速度如何
+const MODEL = "deepseek-ai/DeepSeek-V2.5";
 
 const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to production standards:
 
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     const isTraceMode = isExecutionTraceCode(code);
     
     // Execution trace needs more time for complex analysis
-    const timeoutMs = isTraceMode ? 10000 : 8000;
+    const timeoutMs = isTraceMode ? 12000 : 8000;
 
     // 设置超时
     const controller = new AbortController();
