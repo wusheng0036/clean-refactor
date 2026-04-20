@@ -175,39 +175,39 @@ console.log('4');
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]">
       {/* Header */}
-      <header className="border-b border-slate-800/50 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-slate-800/50 bg-[#0a0a0f]/60 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-white">CleanRefactor AI</h1>
+                <h1 className="text-lg font-bold text-white tracking-tight">CleanRefactor AI</h1>
                 <p className="text-xs text-slate-500">{session?.user?.email}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {isPaid ? (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-full">
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/40 rounded-full shadow-lg shadow-amber-500/10">
                   <Crown className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-medium text-amber-400">PRO</span>
+                  <span className="text-sm font-bold text-amber-400">PRO</span>
                 </div>
               ) : (
                 <Link 
                   href="/#pricing" 
-                  className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-full transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 border border-slate-600 rounded-full transition-all shadow-lg"
                 >
-                  <Zap className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-400">Upgrade to PRO</span>
+                  <Zap className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm font-medium text-white">Upgrade</span>
                 </Link>
               )}
               <Link 
                 href="/" 
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800/80 rounded-xl transition-all"
               >
                 <Home className="w-5 h-5" />
               </Link>
@@ -216,7 +216,7 @@ console.log('4');
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Error */}
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-400">
@@ -226,34 +226,38 @@ console.log('4');
         )}
 
         {/* Quick Examples */}
-        <div className="mb-6 flex flex-wrap gap-2">
-          <span className="text-sm text-slate-500 py-2">Quick examples:</span>
+        <div className="mb-8 flex flex-wrap items-center gap-3">
+          <span className="text-sm text-slate-400 font-medium">Try an example:</span>
           <button
             onClick={() => loadExample('refactor')}
-            className="px-3 py-1.5 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors"
+            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-500/50 text-slate-300 hover:text-blue-400 rounded-xl transition-all"
           >
+            <Code2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
             Refactoring
           </button>
           <button
             onClick={() => loadExample('eventloop')}
-            className="px-3 py-1.5 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors"
+            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-purple-600/20 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-400 rounded-xl transition-all"
           >
+            <Terminal className="w-4 h-4 group-hover:scale-110 transition-transform" />
             Event Loop
           </button>
         </div>
 
         {/* Code Editors with Center Button */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 mb-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 mb-8 items-stretch">
           {/* Input */}
-          <div className="bg-[#13131a] rounded-xl border border-slate-800 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-[#1a1a24]">
-              <div className="flex items-center gap-2">
-                <Code2 className="w-4 h-4 text-blue-400" />
-                <span className="text-sm font-medium text-slate-300">Input Code</span>
+          <div className="bg-[#13131a]/80 backdrop-blur rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl shadow-black/20">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#1a1a24]/80">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <Code2 className="w-4 h-4 text-blue-400" />
+                </div>
+                <span className="text-sm font-semibold text-slate-200">Input Code</span>
               </div>
               <button
                 onClick={handleClear}
-                className="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-500 hover:text-red-400 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear
@@ -262,34 +266,35 @@ console.log('4');
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full h-80 bg-[#13131a] text-slate-300 p-4 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full h-96 bg-[#13131a] text-slate-300 p-5 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed"
               placeholder="Paste your code here..."
               spellCheck={false}
             />
           </div>
 
           {/* Center Refactor Button */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center py-4 lg:py-0">
             <button
               onClick={handleRefactor}
               disabled={loading || !isPaid}
-              className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-6 px-8 rounded-2xl transition-all shadow-xl shadow-blue-500/30 disabled:shadow-none min-w-[140px]"
+              className="group relative overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-400 hover:via-purple-400 hover:to-pink-400 disabled:from-slate-700 disabled:via-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-8 px-10 rounded-3xl transition-all shadow-2xl shadow-purple-500/30 disabled:shadow-none min-w-[160px] hover:shadow-purple-500/50 hover:scale-105 active:scale-95"
             >
-              <div className="relative flex flex-col items-center gap-2">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <div className="relative flex flex-col items-center gap-3">
                 {loading ? (
                   <>
-                    <Loader2 className="w-8 h-8 animate-spin" />
-                    <span className="text-xs">Analyzing...</span>
+                    <Loader2 className="w-10 h-10 animate-spin" />
+                    <span className="text-sm font-medium">Analyzing...</span>
                   </>
                 ) : !isPaid ? (
                   <>
-                    <Lock className="w-8 h-8" />
-                    <span className="text-xs">PRO Only</span>
+                    <Lock className="w-10 h-10" />
+                    <span className="text-sm font-medium">PRO Only</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-10 h-10 group-hover:scale-110 transition-transform" />
-                    <span className="text-sm">Refactor</span>
+                    <Zap className="w-12 h-12 group-hover:scale-110 transition-transform drop-shadow-lg" />
+                    <span className="text-base font-bold tracking-wide">Refactor</span>
                   </>
                 )}
               </div>
@@ -297,16 +302,18 @@ console.log('4');
           </div>
 
           {/* Output */}
-          <div className="bg-[#13131a] rounded-xl border border-slate-800 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-[#1a1a24]">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" />
-                <span className="text-sm font-medium text-slate-300">Refactored Code</span>
+          <div className="bg-[#13131a]/80 backdrop-blur rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl shadow-black/20">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#1a1a24]/80">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                </div>
+                <span className="text-sm font-semibold text-slate-200">Refactored Code</span>
               </div>
               <button
                 onClick={handleCopy}
                 disabled={!result}
-                className="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-500 hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all"
               >
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? 'Copied!' : 'Copy'}
@@ -315,7 +322,7 @@ console.log('4');
             <textarea
               value={result}
               readOnly
-              className="w-full h-80 bg-[#13131a] text-emerald-400 p-4 font-mono text-sm resize-none focus:outline-none"
+              className="w-full h-96 bg-[#13131a] text-emerald-400 p-5 font-mono text-sm resize-none focus:outline-none leading-relaxed"
               placeholder="Result will appear here..."
               spellCheck={false}
             />
