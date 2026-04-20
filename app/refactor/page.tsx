@@ -218,7 +218,7 @@ console.log('4');
         <div className="flex justify-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-blue-500/30 rounded-full shadow-lg shadow-blue-500/10">
             <span className="text-lg">👋</span>
-            <span className="text-sm text-slate-300">嘿，</span>
+            <span className="text-sm text-slate-300">Hey, </span>
             <span className="text-sm font-semibold text-white">{session?.user?.name || session?.user?.email?.split('@')[0] || '开发者'}</span>
           </div>
         </div>
