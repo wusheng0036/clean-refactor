@@ -182,9 +182,9 @@ console.log('4');
           <div className="flex justify-end items-center h-14">
             <div className="flex items-center gap-3">
               {isPaid ? (
-                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/40 rounded-full shadow-lg shadow-amber-500/10">
-                  <Crown className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-bold text-amber-400">PRO</span>
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/30 via-amber-500/30 to-yellow-500/30 border border-yellow-400/50 rounded-full shadow-lg shadow-yellow-500/20">
+                  <Crown className="w-4 h-4 text-yellow-300" />
+                  <span className="text-sm font-bold text-yellow-300">PRO</span>
                 </div>
               ) : (
                 <Link 
@@ -260,18 +260,18 @@ console.log('4');
 
         {/* Code Editors with Center Button */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 mb-8 items-stretch">
-          {/* Input - Green Gradient Background */}
-          <div className="group rounded-2xl border border-emerald-700/50 overflow-hidden shadow-2xl shadow-black/20 hover:border-emerald-500/50 hover:shadow-emerald-500/10 transition-all duration-300">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-800/50 bg-gradient-to-r from-emerald-900/60 to-teal-900/40">
+          {/* Input - Bright Green Background */}
+          <div className="group rounded-2xl border border-emerald-600/40 overflow-hidden shadow-2xl shadow-black/20 hover:border-emerald-400/50 hover:shadow-emerald-500/10 transition-all duration-300">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-700/40 bg-gradient-to-r from-emerald-800/80 to-teal-800/60">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500/30 to-teal-600/20 rounded-lg flex items-center justify-center border border-emerald-500/30">
-                  <Code2 className="w-4 h-4 text-emerald-400" />
+                <div className="w-8 h-8 bg-gradient-to-br from-emerald-400/40 to-teal-500/30 rounded-lg flex items-center justify-center border border-emerald-400/40">
+                  <Code2 className="w-4 h-4 text-emerald-300" />
                 </div>
-                <span className="text-sm font-semibold text-emerald-100">Input Code</span>
+                <span className="text-sm font-semibold text-emerald-50">Input Code</span>
               </div>
               <button
                 onClick={handleClear}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs text-emerald-400/70 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all hover:scale-105"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs text-emerald-300/80 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all hover:scale-105"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear
@@ -280,48 +280,48 @@ console.log('4');
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full h-96 bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-emerald-800/30 text-emerald-50 p-5 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/30 leading-relaxed selection:bg-emerald-500/30 selection:text-white"
+              className="w-full h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50 text-emerald-100 p-5 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400/40 leading-relaxed selection:bg-emerald-400/40 selection:text-white"
               placeholder="Paste your code here..."
               spellCheck={false}
             />
           </div>
 
-          {/* Center Refactor Button - 3D Style */}
+          {/* Center Refactor Button - Subtle 3D */}
           <div className="flex items-center justify-center py-4 lg:py-0">
             <button
               onClick={handleRefactor}
               disabled={loading || !isPaid}
-              className="group relative disabled:cursor-not-allowed min-w-[180px]"
+              className="group relative disabled:cursor-not-allowed min-w-[140px]"
             >
-              {/* 3D Button Base/Shadow */}
-              <div className="absolute inset-0 bg-gradient-to-b from-purple-700 to-purple-900 rounded-3xl translate-y-2 group-hover:translate-y-3 group-active:translate-y-1 transition-transform duration-150" />
+              {/* Subtle 3D Shadow */}
+              <div className="absolute inset-0 bg-purple-600/50 rounded-2xl translate-y-1.5 group-hover:translate-y-2 group-active:translate-y-0.5 transition-transform duration-150 blur-sm" />
               
-              {/* 3D Button Face */}
+              {/* Button Face */}
               <div className={`
-                relative flex flex-col items-center gap-2 py-6 px-10 rounded-3xl
-                bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500
+                relative flex flex-col items-center gap-1.5 py-4 px-8 rounded-2xl
+                bg-gradient-to-br from-purple-400 via-purple-500 to-pink-500
                 disabled:from-slate-600 disabled:via-slate-700 disabled:to-slate-800
                 transition-all duration-150
-                group-hover:-translate-y-1 group-active:translate-y-1
+                group-hover:-translate-y-0.5 group-active:translate-y-0.5
               `}>
-                {/* Shine effect */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+                {/* Top shine */}
+                <div className="absolute inset-x-0 top-0 h-1/2 rounded-t-2xl bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
                 
-                <div className="relative flex flex-col items-center gap-2">
+                <div className="relative flex flex-col items-center gap-1">
                   {loading ? (
                     <>
-                      <Loader2 className="w-10 h-10 animate-spin drop-shadow-md" />
-                      <span className="text-sm font-medium drop-shadow-md">Analyzing...</span>
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <span className="text-xs font-medium">Analyzing...</span>
                     </>
                   ) : !isPaid ? (
                     <>
-                      <Lock className="w-10 h-10 drop-shadow-md" />
-                      <span className="text-sm font-medium drop-shadow-md">PRO Only</span>
+                      <Lock className="w-8 h-8" />
+                      <span className="text-xs font-medium">PRO Only</span>
                     </>
                   ) : (
                     <>
-                      <Zap className="w-12 h-12 drop-shadow-lg group-hover:scale-110 transition-transform duration-200" />
-                      <span className="text-lg font-bold tracking-wide drop-shadow-lg">Refactor</span>
+                      <Zap className="w-10 h-10 group-hover:scale-105 transition-transform duration-200" />
+                      <span className="text-base font-bold tracking-wide">Refactor</span>
                     </>
                   )}
                 </div>
@@ -329,28 +329,28 @@ console.log('4');
             </button>
           </div>
 
-          {/* Output - Green Gradient Background */}
-          <div className="group rounded-2xl border border-emerald-700/50 overflow-hidden shadow-2xl shadow-black/20 hover:border-emerald-500/50 hover:shadow-emerald-500/10 transition-all duration-300">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-800/50 bg-gradient-to-r from-emerald-900/60 to-teal-900/40">
+          {/* Output - Bright Green Background */}
+          <div className="group rounded-2xl border border-emerald-600/40 overflow-hidden shadow-2xl shadow-black/20 hover:border-emerald-400/50 hover:shadow-emerald-500/10 transition-all duration-300">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-700/40 bg-gradient-to-r from-emerald-800/80 to-teal-800/60">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500/30 to-teal-600/20 rounded-lg flex items-center justify-center border border-emerald-500/30">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                <div className="w-8 h-8 bg-gradient-to-br from-emerald-400/40 to-teal-500/30 rounded-lg flex items-center justify-center border border-emerald-400/40">
+                  <Sparkles className="w-4 h-4 text-emerald-300" />
                 </div>
-                <span className="text-sm font-semibold text-emerald-100">Refactored Code</span>
+                <span className="text-sm font-semibold text-emerald-50">Refactored Code</span>
               </div>
               <button
                 onClick={handleCopy}
                 disabled={!result}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs text-emerald-400/70 hover:text-blue-400 hover:bg-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all hover:scale-105"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs text-emerald-300/80 hover:text-blue-400 hover:bg-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all hover:scale-105"
               >
-                {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
             <textarea
               value={result}
               readOnly
-              className="w-full h-96 bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-emerald-800/30 text-emerald-300 p-5 font-mono text-sm resize-none focus:outline-none leading-relaxed selection:bg-emerald-500/30 selection:text-white"
+              className="w-full h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50 text-emerald-200 p-5 font-mono text-sm resize-none focus:outline-none leading-relaxed selection:bg-emerald-400/40 selection:text-white"
               placeholder="Result will appear here..."
               spellCheck={false}
             />
