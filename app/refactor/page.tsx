@@ -181,12 +181,16 @@ console.log('4');
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-105 transition-all duration-300 cursor-pointer">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h1 className="text-lg font-bold text-white tracking-tight">CleanRefactor AI</h1>
-                <p className="text-xs text-slate-500">{session?.user?.email}</p>
+                <p className="text-xs text-slate-400 flex items-center gap-1">
+                  <span className="text-blue-400">👋</span>
+                  <span>嘿，</span>
+                  <span className="text-slate-200 font-medium">{session?.user?.name || session?.user?.email?.split('@')[0] || '开发者'}</span>
+                </p>
               </div>
             </div>
             
@@ -227,19 +231,22 @@ console.log('4');
 
         {/* Quick Examples */}
         <div className="mb-8 flex flex-wrap items-center gap-3">
-          <span className="text-sm text-slate-400 font-medium">Try an example:</span>
+          <span className="text-sm text-slate-400 font-medium flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            Try an example:
+          </span>
           <button
             onClick={() => loadExample('refactor')}
-            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-500/50 text-slate-300 hover:text-blue-400 rounded-xl transition-all"
+            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-500/50 text-slate-300 hover:text-blue-400 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5"
           >
-            <Code2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <Code2 className="w-4 h-4 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
             Refactoring
           </button>
           <button
             onClick={() => loadExample('eventloop')}
-            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-purple-600/20 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-400 rounded-xl transition-all"
+            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-purple-600/20 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-400 rounded-xl transition-all hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-0.5"
           >
-            <Terminal className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <Terminal className="w-4 h-4 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
             Event Loop
           </button>
         </div>
@@ -247,17 +254,17 @@ console.log('4');
         {/* Code Editors with Center Button */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 mb-8 items-stretch">
           {/* Input */}
-          <div className="bg-[#13131a]/80 backdrop-blur rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl shadow-black/20">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#1a1a24]/80">
+          <div className="group bg-[#13131a]/80 backdrop-blur rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl shadow-black/20 hover:border-blue-500/30 hover:shadow-blue-500/10 transition-all duration-300">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-gradient-to-r from-[#1a1a24]/80 to-[#1a1a24]/60">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-lg flex items-center justify-center border border-blue-500/20">
                   <Code2 className="w-4 h-4 text-blue-400" />
                 </div>
                 <span className="text-sm font-semibold text-slate-200">Input Code</span>
               </div>
               <button
                 onClick={handleClear}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all hover:scale-105"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear
@@ -266,7 +273,7 @@ console.log('4');
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full h-96 bg-[#13131a] text-slate-300 p-5 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed"
+              className="w-full h-96 bg-[#13131a] text-slate-300 p-5 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed selection:bg-blue-500/30 selection:text-white"
               placeholder="Paste your code here..."
               spellCheck={false}
             />
@@ -277,9 +284,14 @@ console.log('4');
             <button
               onClick={handleRefactor}
               disabled={loading || !isPaid}
-              className="group relative overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-400 hover:via-purple-400 hover:to-pink-400 disabled:from-slate-700 disabled:via-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-8 px-10 rounded-3xl transition-all shadow-2xl shadow-purple-500/30 disabled:shadow-none min-w-[160px] hover:shadow-purple-500/50 hover:scale-105 active:scale-95"
+              className="group relative overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-400 hover:via-purple-400 hover:to-pink-400 disabled:from-slate-700 disabled:via-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-8 px-10 rounded-3xl transition-all shadow-2xl shadow-purple-500/30 disabled:shadow-none min-w-[160px] hover:shadow-purple-500/50 hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:scale-105 active:scale-95"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              {/* Animated background shine */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              {/* Pulse ring animation */}
+              {!loading && isPaid && (
+                <div className="absolute inset-0 rounded-3xl animate-ping bg-purple-500/20 opacity-0 group-hover:opacity-100 duration-700" />
+              )}
               <div className="relative flex flex-col items-center gap-3">
                 {loading ? (
                   <>
@@ -293,7 +305,7 @@ console.log('4');
                   </>
                 ) : (
                   <>
-                    <Zap className="w-12 h-12 group-hover:scale-110 transition-transform drop-shadow-lg" />
+                    <Zap className="w-12 h-12 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 drop-shadow-lg" />
                     <span className="text-base font-bold tracking-wide">Refactor</span>
                   </>
                 )}
@@ -302,10 +314,10 @@ console.log('4');
           </div>
 
           {/* Output */}
-          <div className="bg-[#13131a]/80 backdrop-blur rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl shadow-black/20">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#1a1a24]/80">
+          <div className="group bg-[#13131a]/80 backdrop-blur rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl shadow-black/20 hover:border-purple-500/30 hover:shadow-purple-500/10 transition-all duration-300">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-gradient-to-r from-[#1a1a24]/80 to-[#1a1a24]/60">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg flex items-center justify-center border border-purple-500/20">
                   <Sparkles className="w-4 h-4 text-purple-400" />
                 </div>
                 <span className="text-sm font-semibold text-slate-200">Refactored Code</span>
@@ -313,7 +325,7 @@ console.log('4');
               <button
                 onClick={handleCopy}
                 disabled={!result}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all hover:scale-105"
               >
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? 'Copied!' : 'Copy'}
@@ -322,7 +334,7 @@ console.log('4');
             <textarea
               value={result}
               readOnly
-              className="w-full h-96 bg-[#13131a] text-emerald-400 p-5 font-mono text-sm resize-none focus:outline-none leading-relaxed"
+              className="w-full h-96 bg-[#13131a] text-emerald-400 p-5 font-mono text-sm resize-none focus:outline-none leading-relaxed selection:bg-emerald-500/30 selection:text-white"
               placeholder="Result will appear here..."
               spellCheck={false}
             />
@@ -333,9 +345,11 @@ console.log('4');
         {analysis && (
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Score Card */}
-            <div className="bg-[#13131a] rounded-xl border border-slate-800 p-6">
+            <div className="group bg-[#13131a] rounded-xl border border-slate-800 p-6 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
               <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-blue-400" />
+                <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-blue-400" />
+                </div>
                 <h3 className="font-semibold text-white">Code Quality Score</h3>
               </div>
               <div className="flex items-center justify-center">
@@ -365,15 +379,17 @@ console.log('4');
             </div>
 
             {/* Improvements */}
-            <div className="bg-[#13131a] rounded-xl border border-slate-800 p-6 lg:col-span-2">
+            <div className="group bg-[#13131a] rounded-xl border border-slate-800 p-6 lg:col-span-2 hover:border-yellow-500/30 hover:shadow-lg hover:shadow-yellow-500/10 transition-all duration-300">
               <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-yellow-400" />
+                <div className="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center">
+                  <Lightbulb className="w-5 h-5 text-yellow-400" />
+                </div>
                 <h3 className="font-semibold text-white">Key Improvements</h3>
               </div>
               <ul className="space-y-3">
                 {analysis.improvements?.map((item: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-3 text-slate-300 group/item hover:text-slate-200 transition-colors">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5 group-hover/item:scale-110 transition-transform" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -384,10 +400,12 @@ console.log('4');
 
         {/* Execution Trace Analysis */}
         {mode === 'execution-trace' && executionTrace && (
-          <div className="mt-8 bg-[#13131a] rounded-xl border border-slate-800 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-800 bg-[#1a1a24]">
-              <div className="flex items-center gap-2">
-                <Terminal className="w-5 h-5 text-purple-400" />
+          <div className="mt-8 bg-[#13131a] rounded-xl border border-slate-800 overflow-hidden hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
+            <div className="px-6 py-4 border-b border-slate-800 bg-gradient-to-r from-[#1a1a24] to-[#1a1a24]/80">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                  <Terminal className="w-5 h-5 text-purple-400" />
+                </div>
                 <h2 className="text-lg font-semibold text-white">Execution Order Analysis</h2>
               </div>
             </div>
@@ -395,11 +413,14 @@ console.log('4');
             <div className="p-6 space-y-6">
               {/* Predicted Order */}
               <div>
-                <h3 className="text-sm font-medium text-slate-400 mb-3">Predicted Output Order</h3>
+                <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  Predicted Output Order
+                </h3>
                 <div className="flex flex-wrap items-center gap-2">
                   {executionTrace.predictedOrder?.map((item: string, i: number) => (
                     <div key={i} className="flex items-center">
-                      <div className="px-4 py-2 bg-slate-800 rounded-lg font-mono text-sm text-emerald-400 border border-slate-700">
+                      <div className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg font-mono text-sm text-emerald-400 border border-slate-700 hover:border-emerald-500/30 transition-all cursor-default">
                         {item}
                       </div>
                       {i < executionTrace.predictedOrder.length - 1 && (
@@ -412,9 +433,11 @@ console.log('4');
 
               {/* Key Insight */}
               {executionTrace.keyInsight && (
-                <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-xl p-4 hover:border-purple-500/50 transition-all">
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                    <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Lightbulb className="w-5 h-5 text-purple-400" />
+                    </div>
                     <div>
                       <h3 className="font-medium text-purple-400 mb-1">Key Insight</h3>
                       <p className="text-slate-300 text-sm leading-relaxed">{executionTrace.keyInsight}</p>
