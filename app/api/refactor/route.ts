@@ -5,6 +5,9 @@ import { checkAccess } from "../user/status/route";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
 
+// Use OpenAI GPT-3.5-turbo for faster response
+const MODEL = "gpt-3.5-turbo";
+
 const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to production standards:
 
 - Use const/let instead of var
@@ -61,8 +64,8 @@ export async function POST(req: Request) {
 
     const isTraceMode = isExecutionTraceCode(code);
     
-    // 如果是执行顺序问题，使用更短的超时
-    const timeoutMs = isTraceMode ? 10000 : 15000;
+    // GPT-3.5 is fast, use shorter timeout
+    const timeoutMs = isTraceMode ? 8000 : 10000;
 
     // 设置超时
     const controller = new AbortController();
@@ -75,7 +78,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-V2.5",
+        model: MODEL,
         messages: [
           { role: "system", content: isTraceMode ? EXECUTION_TRACE_PROMPT : REFACTOR_PROMPT },
           { role: "user", content: isTraceMode ? `Analyze:\n${code}` : `Refactor:\n${code}` }
