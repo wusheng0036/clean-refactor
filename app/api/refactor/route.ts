@@ -121,6 +121,7 @@ async function callSiliconFlowAPI(code: string, isTraceMode: boolean) {
       refactoredCode: code,
       executionTrace,
       mode: "execution-trace",
+      model: "siliconflow",
     });
   }
 
@@ -180,6 +181,7 @@ async function callZhipuAPI(code: string, isTraceMode: boolean) {
       refactoredCode: code,
       executionTrace,
       mode: "execution-trace",
+      model: "zhipu",
     });
   }
 

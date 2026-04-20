@@ -316,7 +316,7 @@ console.log('4');
         </div>
 
         {/* Model Selector */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl">
             <span className="text-xs text-slate-400">Model:</span>
             <select
@@ -329,6 +329,21 @@ console.log('4');
             </select>
           </div>
         </div>
+
+        {/* Used Model Display */}
+        {usedModel && (
+          <div className="flex justify-center mb-4">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+              usedModel === 'zhipu' 
+                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
+                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+            }`}>
+              <span>实际使用:</span>
+              <span>{usedModel === 'zhipu' ? '智谱 GLM-4' : '硅基 DeepSeek'}</span>
+              {usedModel === 'zhipu' && <span className="text-[10px] opacity-70">(自动切换)</span>}
+            </div>
+          </div>
+        )}
 
         {/* Code Editors with Center Button */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 mb-8 items-stretch">
