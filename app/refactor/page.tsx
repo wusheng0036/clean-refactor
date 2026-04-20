@@ -381,6 +381,7 @@ console.log('4');
               onClick={handleRefactor}
               disabled={loading || !isPaid}
               className="group relative disabled:cursor-not-allowed min-w-[120px] lg:min-w-[140px]"
+            >
               {/* Subtle 3D Shadow */}
               <div className="absolute inset-0 bg-purple-600/50 rounded-2xl translate-y-1.5 group-hover:translate-y-2 group-active:translate-y-0.5 transition-transform duration-150 blur-sm" />
               
