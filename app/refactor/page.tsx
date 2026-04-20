@@ -181,8 +181,8 @@ console.log('4');
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-105 transition-all duration-300 cursor-pointer">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300 cursor-pointer group">
+                <Sparkles className="w-5 h-5 text-white group-hover:animate-spin" />
               </div>
               <h1 className="text-lg font-bold text-white tracking-tight">CleanRefactor AI</h1>
             </div>
