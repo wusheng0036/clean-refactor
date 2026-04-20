@@ -12,5 +12,10 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/refactor/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

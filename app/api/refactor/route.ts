@@ -125,6 +125,9 @@ function isExecutionTraceCode(code: string): boolean {
   return matches >= 3; // 至少匹配3个模式就认为是执行顺序分析题
 }
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   try {
     console.log("[Refactor API v2] Starting request...");
@@ -228,39 +231,10 @@ export async function POST(req: Request) {
     const refactorData = await refactorRes.json();
     const refactoredCode = refactorData.choices?.[0]?.message?.content || "";
 
-    // Step 2: Analysis (optional, only if requested)
+    // Step 2: Analysis (optional, disabled by default to reduce timeout)
     let analysis = null;
-    if (includeAnalysis) {
-      const analyzeRes = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "deepseek-ai/DeepSeek-V2.5",
-          messages: [
-            { role: "system", content: ANALYZE_PROMPT },
-            { 
-              role: "user", 
-              content: `Original code:\n${code}\n\nRefactored code:\n${refactoredCode}\n\nProvide analysis in JSON format.` 
-            }
-          ],
-          temperature: 0.3,
-        }),
-      });
-
-      if (analyzeRes.ok) {
-        const analyzeData = await analyzeRes.json();
-        const analysisText = analyzeData.choices?.[0]?.message?.content || "";
-        try {
-          const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
-          analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-        } catch (e) {
-          console.error("Failed to parse analysis:", e);
-        }
-      }
-    }
+    // Skip analysis to reduce API timeout risk
+    // if (includeAnalysis) { ... }
 
     return NextResponse.json({
       refactoredCode,
