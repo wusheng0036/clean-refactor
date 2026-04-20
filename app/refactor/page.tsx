@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { 
   Sparkles, 
   Copy, 
@@ -20,6 +21,17 @@ import {
   Code2,
   Terminal
 } from 'lucide-react';
+
+// Dynamic import for CodeEditor with SSR disabled
+const CodeEditor = dynamic(() => import('@/components/CodeEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center text-slate-400">
+      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+      Loading editor...
+    </div>
+  ),
+});
 
 function RefactorPageInner() {
   const { data: session, status } = useSession();
@@ -348,13 +360,13 @@ console.log('4');
                 Clear
               </button>
             </div>
-            <textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="w-full h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50 text-emerald-100 p-5 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400/40 leading-relaxed selection:bg-emerald-400/40 selection:text-white"
-              placeholder="Paste your code here..."
-              spellCheck={false}
-            />
+            <div className="h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50">
+              <CodeEditor
+                code={code}
+                onChange={setCode}
+                placeholder="Paste your code here..."
+              />
+            </div>
           </div>
 
           {/* Center Refactor Button - Subtle 3D */}
@@ -418,13 +430,13 @@ console.log('4');
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <textarea
-              value={result}
-              readOnly
-              className="w-full h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50 text-emerald-200 p-5 font-mono text-sm resize-none focus:outline-none leading-relaxed selection:bg-emerald-400/40 selection:text-white"
-              placeholder="Result will appear here..."
-              spellCheck={false}
-            />
+            <div className="h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50">
+              <CodeEditor
+                code={result}
+                readOnly
+                placeholder="Result will appear here..."
+              />
+            </div>
           </div>
         </div>
 
