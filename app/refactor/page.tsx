@@ -43,6 +43,7 @@ function example() {
   const [analysis, setAnalysis] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [usedModel, setUsedModel] = useState<string>('');
+  const [selectedModel, setSelectedModel] = useState<'siliconflow' | 'zhipu'>('siliconflow');
 
   useEffect(() => {
     const checkUserStatus = async () => {
