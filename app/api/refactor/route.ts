@@ -60,10 +60,13 @@ export async function POST(req: Request) {
     }
 
     const isTraceMode = isExecutionTraceCode(code);
+    
+    // 如果是执行顺序问题，使用更短的超时
+    const timeoutMs = isTraceMode ? 10000 : 15000;
 
     // 设置超时
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     const openaiRes = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
       method: "POST",
@@ -78,7 +81,7 @@ export async function POST(req: Request) {
           { role: "user", content: isTraceMode ? `Analyze:\n${code}` : `Refactor:\n${code}` }
         ],
         temperature: 0.2,
-        max_tokens: 1000, // 减少token数量，加快响应
+        max_tokens: isTraceMode ? 1000 : 2000, // 执行分析用较少token
       }),
       signal: controller.signal,
     });
