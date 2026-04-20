@@ -281,36 +281,45 @@ console.log('4');
             />
           </div>
 
-          {/* Center Refactor Button */}
+          {/* Center Refactor Button - 3D Style */}
           <div className="flex items-center justify-center py-4 lg:py-0">
             <button
               onClick={handleRefactor}
               disabled={loading || !isPaid}
-              className="group relative overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-400 hover:via-purple-400 hover:to-pink-400 disabled:from-slate-700 disabled:via-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-8 px-10 rounded-3xl transition-all shadow-2xl shadow-purple-500/30 disabled:shadow-none min-w-[160px] hover:shadow-purple-500/50 hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:scale-105 active:scale-95"
+              className="group relative disabled:cursor-not-allowed min-w-[180px]"
             >
-              {/* Animated background shine */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-              {/* Pulse ring animation */}
-              {!loading && isPaid && (
-                <div className="absolute inset-0 rounded-3xl animate-ping bg-purple-500/20 opacity-0 group-hover:opacity-100 duration-700" />
-              )}
-              <div className="relative flex flex-col items-center gap-3">
-                {loading ? (
-                  <>
-                    <Loader2 className="w-10 h-10 animate-spin" />
-                    <span className="text-sm font-medium">Analyzing...</span>
-                  </>
-                ) : !isPaid ? (
-                  <>
-                    <Lock className="w-10 h-10" />
-                    <span className="text-sm font-medium">PRO Only</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-12 h-12 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 drop-shadow-lg" />
-                    <span className="text-base font-bold tracking-wide">Refactor</span>
-                  </>
-                )}
+              {/* 3D Button Base/Shadow */}
+              <div className="absolute inset-0 bg-gradient-to-b from-purple-700 to-purple-900 rounded-3xl translate-y-2 group-hover:translate-y-3 group-active:translate-y-1 transition-transform duration-150" />
+              
+              {/* 3D Button Face */}
+              <div className={`
+                relative flex flex-col items-center gap-2 py-6 px-10 rounded-3xl
+                bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500
+                disabled:from-slate-600 disabled:via-slate-700 disabled:to-slate-800
+                transition-all duration-150
+                group-hover:-translate-y-1 group-active:translate-y-1
+              `}>
+                {/* Shine effect */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+                
+                <div className="relative flex flex-col items-center gap-2">
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-10 h-10 animate-spin drop-shadow-md" />
+                      <span className="text-sm font-medium drop-shadow-md">Analyzing...</span>
+                    </>
+                  ) : !isPaid ? (
+                    <>
+                      <Lock className="w-10 h-10 drop-shadow-md" />
+                      <span className="text-sm font-medium drop-shadow-md">PRO Only</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-12 h-12 drop-shadow-lg group-hover:scale-110 transition-transform duration-200" />
+                      <span className="text-lg font-bold tracking-wide drop-shadow-lg">Refactor</span>
+                    </>
+                  )}
+                </div>
               </div>
             </button>
           </div>
