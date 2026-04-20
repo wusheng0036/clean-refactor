@@ -90,7 +90,29 @@ function example() {
       if (!res.ok) {
         setError(data.error + (data.details ? `: ${data.details}` : '') || 'Request failed');
       } else {
-        setResult(data.refactoredCode || '');
+        setMode(data.mode || 'refactor');
+        setExecutionTrace(data.executionTrace || null);
+        
+        // For execution trace mode, format the result nicely
+        if (data.mode === 'execution-trace' && data.executionTrace) {
+          const trace = data.executionTrace;
+          let formattedResult = '// Execution Order Analysis\n\n';
+          
+          if (trace.predictedOrder) {
+            formattedResult += '// Predicted Output Order:\n';
+            formattedResult += trace.predictedOrder.join(' → ');
+            formattedResult += '\n\n';
+          }
+          
+          if (trace.keyInsight) {
+            formattedResult += '// Key Insight:\n';
+            formattedResult += trace.keyInsight;
+          }
+          
+          setResult(formattedResult);
+        } else {
+          setResult(data.refactoredCode || '');
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Error');
