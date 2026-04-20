@@ -43,7 +43,6 @@ function example() {
   const [analysis, setAnalysis] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [usedModel, setUsedModel] = useState<string>('');
-  const [selectedModel, setSelectedModel] = useState<'siliconflow' | 'zhipu'>('siliconflow');
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -315,32 +314,17 @@ console.log('4');
           </div>
         </div>
 
-        {/* Model Selector */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl">
-            <span className="text-xs text-slate-400">Model:</span>
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value as 'siliconflow' | 'zhipu')}
-              className="bg-slate-700 text-white text-sm rounded-lg px-3 py-1.5 border border-slate-600 focus:outline-none focus:border-blue-500"
-            >
-              <option value="siliconflow">SiliconFlow (DeepSeek)</option>
-              <option value="zhipu">智谱 AI (GLM-4)</option>
-            </select>
-          </div>
-        </div>
-
         {/* Used Model Display */}
         {usedModel && (
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6">
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
               usedModel === 'zhipu' 
                 ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
                 : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
             }`}>
-              <span>实际使用:</span>
+              <span>AI Model:</span>
               <span>{usedModel === 'zhipu' ? '智谱 GLM-4' : '硅基 DeepSeek'}</span>
-              {usedModel === 'zhipu' && <span className="text-[10px] opacity-70">(自动切换)</span>}
+              {usedModel === 'zhipu' && <span className="text-[10px] opacity-70">(auto)</span>}
             </div>
           </div>
         )}
