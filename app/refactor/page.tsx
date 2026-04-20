@@ -88,7 +88,7 @@ function example() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || data.details || 'Request failed');
+        setError(data.error + (data.details ? `: ${data.details}` : '') || 'Request failed');
       } else {
         setResult(data.refactoredCode || '');
       }

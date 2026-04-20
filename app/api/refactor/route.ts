@@ -92,9 +92,13 @@ export async function POST(req: Request) {
     clearTimeout(timeoutId);
 
     if (!openaiRes.ok) {
-      const errorData = await openaiRes.json();
-      console.error("OpenAI API error:", errorData);
-      return NextResponse.json({ error: "AI service error" }, { status: 500 });
+      const errorText = await openaiRes.text();
+      console.error("OpenAI API error:", openaiRes.status, errorText);
+      return NextResponse.json({ 
+        error: "AI service error", 
+        details: errorText,
+        status: openaiRes.status 
+      }, { status: 500 });
     }
 
     const data = await openaiRes.json();
