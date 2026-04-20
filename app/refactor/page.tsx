@@ -125,7 +125,13 @@ function example() {
           
           setResult(formattedResult);
         } else {
-          setResult(data.refactoredCode || '');
+          // Clean up markdown code blocks if present
+          let cleanCode = data.refactoredCode || '';
+          cleanCode = cleanCode.replace(/^```typescript\n?/, '');
+          cleanCode = cleanCode.replace(/^```javascript\n?/, '');
+          cleanCode = cleanCode.replace(/^```\n?/, '');
+          cleanCode = cleanCode.replace(/\n?```$/, '');
+          setResult(cleanCode);
         }
       }
     } catch (err: any) {
