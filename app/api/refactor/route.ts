@@ -34,12 +34,12 @@ function isExecutionTraceCode(code: string): boolean {
   return matches >= 3;
 }
 
-const EXECUTION_TRACE_PROMPT = `You are a JavaScript event loop expert. Analyze the code and predict the EXACT execution order.
+const EXECUTION_TRACE_PROMPT = `Analyze JavaScript execution order. Be concise.
 
-Output JSON:
+Output JSON only:
 {
-  "predictedOrder": ["1", "2", "3", "4"],
-  "keyInsight": "explanation"
+  "predictedOrder": ["start", "end", "promise", "timeout"],
+  "keyInsight": "brief explanation"
 }`;
 
 export async function POST(req: Request) {
@@ -64,8 +64,8 @@ export async function POST(req: Request) {
 
     const isTraceMode = isExecutionTraceCode(code);
     
-    // Use shorter timeout for faster models
-    const timeoutMs = isTraceMode ? 6000 : 8000;
+    // Execution trace needs more time for complex analysis
+    const timeoutMs = isTraceMode ? 10000 : 8000;
 
     // 设置超时
     const controller = new AbortController();
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
           { role: "user", content: isTraceMode ? `Analyze:\n${code}` : `Refactor:\n${code}` }
         ],
         temperature: 0.2,
-        max_tokens: isTraceMode ? 800 : 1500, // 减少token加快响应
+        max_tokens: isTraceMode ? 500 : 1500, // 执行分析用更少token
       }),
       signal: controller.signal,
     });
