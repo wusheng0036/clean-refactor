@@ -42,6 +42,7 @@ function example() {
   const [mode, setMode] = useState<'refactor' | 'execution-trace'>('refactor');
   const [analysis, setAnalysis] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<'siliconflow' | 'zhipu'>('siliconflow');
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -82,7 +83,7 @@ function example() {
       const res = await fetch('/api/refactor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, model: selectedModel }),
       });
 
       const data = await res.json();
@@ -275,7 +276,7 @@ console.log('4');
         )}
 
         {/* Quick Examples - Centered with Background Box, Smaller */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-4">
           <div className="inline-flex flex-wrap items-center justify-center gap-3 px-6 py-4 bg-[#13131a]/80 border border-slate-700/50 rounded-2xl shadow-xl shadow-black/20">
             <span className="text-sm text-slate-400 font-medium flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
@@ -295,6 +296,21 @@ console.log('4');
               <Terminal className="w-4 h-4 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
               Event Loop
             </button>
+          </div>
+        </div>
+
+        {/* Model Selector */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl">
+            <span className="text-xs text-slate-400">Model:</span>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value as 'siliconflow' | 'zhipu')}
+              className="bg-slate-700 text-white text-sm rounded-lg px-3 py-1.5 border border-slate-600 focus:outline-none focus:border-blue-500"
+            >
+              <option value="siliconflow">SiliconFlow (DeepSeek)</option>
+              <option value="zhipu">智谱 AI (GLM-4)</option>
+            </select>
           </div>
         </div>
 
