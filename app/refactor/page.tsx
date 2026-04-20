@@ -176,17 +176,10 @@ console.log('4');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]">
-      {/* Header */}
+      {/* Header - Minimal */}
       <header className="border-b border-slate-800/50 bg-[#0a0a0f]/60 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300 cursor-pointer group">
-                <Sparkles className="w-5 h-5 text-white group-hover:animate-spin" />
-              </div>
-              <h1 className="text-lg font-bold text-white tracking-tight">CleanRefactor AI</h1>
-            </div>
-            
+          <div className="flex justify-end items-center h-14">
             <div className="flex items-center gap-3">
               {isPaid ? (
                 <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/40 rounded-full shadow-lg shadow-amber-500/10">
@@ -213,7 +206,17 @@ console.log('4');
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Logo & Title - Centered */}
+        <div className="flex justify-center mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300 cursor-pointer group">
+              <Sparkles className="w-7 h-7 text-white group-hover:animate-spin" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">CleanRefactor AI</h1>
+          </div>
+        </div>
+
         {/* User Greeting - Centered with Badge */}
         <div className="flex justify-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-blue-500/30 rounded-full shadow-lg shadow-blue-500/10">
