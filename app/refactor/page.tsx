@@ -80,11 +80,10 @@ function example() {
 
   const handleRefactor = async () => {
     if (!code.trim()) return;
-    // 临时跳过付费检查，方便测试
-    // if (!isPaid) {
-    //   setError('Payment required');
-    //   return;
-    // }
+    if (!isPaid) {
+      setError('Payment required');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -402,6 +401,11 @@ console.log('4');
                     <>
                       <Loader2 className="w-8 h-8 animate-spin" />
                       <span className="text-xs font-medium">Analyzing...</span>
+                    </>
+                  ) : !isPaid ? (
+                    <>
+                      <Lock className="w-8 h-8" />
+                      <span className="text-xs font-medium">PRO Only</span>
                     </>
                   ) : (
                     <>
