@@ -85,54 +85,18 @@ function example() {
         body: JSON.stringify({ code }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || 'Request failed');
-        setLoading(false);
-        return;
+        setError(data.error || data.details || 'Request failed');
+      } else {
+        setResult(data.refactoredCode || '');
       }
-
-      // Handle streaming response
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = '';
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-          
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              if (data === '[DONE]') {
-                setLoading(false);
-                return;
-              }
-              
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices?.[0]?.delta?.content || '';
-                if (content) {
-                  fullContent += content;
-                  setResult(fullContent);
-                }
-              } catch (e) {
-                // Ignore parse errors for incomplete chunks
-              }
-            }
-          }
-        }
-      }
-
-      setLoading(false);
     } catch (err: any) {
       setError(err.message || 'Error');
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const handleCopy = async () => {

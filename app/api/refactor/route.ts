@@ -3,7 +3,6 @@ import { getToken } from "next-auth/jwt";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
-const PAYMENT_API_URL = process.env.PAYMENT_API_URL || "https://cleanrefactor-payment-worker.donggua.workers.dev";
 
 const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to production standards:
 
@@ -12,7 +11,6 @@ const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to pr
 - Use arrow functions
 - Add proper error handling
 - Use descriptive variable names
-- Add JSDoc comments
 
 Return ONLY the refactored code, no explanations.`;
 
@@ -20,35 +18,30 @@ export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("[Refactor API] Starting...");
+    
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    console.log("[Refactor API] Token:", token?.email);
     
     if (!token?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check payment status
-    const paymentRes = await fetch(`${PAYMENT_API_URL}/api/check-payment?email=${encodeURIComponent(token.email)}`, {
-      headers: {
-        'Authorization': `Bearer ${process.env.PAYMENT_API_SECRET || ''}`
-      }
-    });
-    
-    if (!paymentRes.ok) {
-      return NextResponse.json({ error: "Payment required" }, { status: 403 });
-    }
-    
-    const paymentData = await paymentRes.json();
-    if (!paymentData.paid) {
-      return NextResponse.json({ error: "Payment required" }, { status: 403 });
+      return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
     }
 
     const { code } = await req.json();
+    console.log("[Refactor API] Code:", code?.substring(0, 50));
     
     if (!code) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
 
-    // Call OpenAI with streaming
+    if (!OPENAI_API_KEY) {
+      console.error("[Refactor API] Missing OPENAI_API_KEY");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    }
+
+    console.log("[Refactor API] Calling OpenAI...");
+    
+    // Call OpenAI without streaming first to test
     const openaiRes = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
       method: "POST",
       headers: {
@@ -62,28 +55,35 @@ export async function POST(req: NextRequest) {
           { role: "user", content: `Refactor this code:\n\n${code}` }
         ],
         temperature: 0.2,
-        stream: true, // Enable streaming
+        max_tokens: 2000,
       }),
     });
 
+    console.log("[Refactor API] OpenAI status:", openaiRes.status);
+
     if (!openaiRes.ok) {
-      const errorData = await openaiRes.json();
-      console.error("OpenAI API error:", errorData);
-      return NextResponse.json({ error: "AI service error" }, { status: 500 });
+      const errorText = await openaiRes.text();
+      console.error("[Refactor API] OpenAI error:", errorText);
+      return NextResponse.json({ 
+        error: "AI service error", 
+        details: errorText 
+      }, { status: 500 });
     }
 
-    // Return the stream directly to the client
-    return new Response(openaiRes.body, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+    const data = await openaiRes.json();
+    const refactoredCode = data.choices?.[0]?.message?.content || "";
+    
+    console.log("[Refactor API] Success, code length:", refactoredCode.length);
+
+    return NextResponse.json({
+      refactoredCode,
+      mode: "refactor",
     });
   } catch (err: any) {
     console.error("[Refactor API] Error:", err);
     return NextResponse.json({ 
-      error: err.message || "Server error" 
+      error: err.message || "Server error",
+      stack: err.stack
     }, { status: 500 });
   }
 }
