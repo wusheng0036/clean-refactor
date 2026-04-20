@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import { checkAccess } from "../user/status/route";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://open.bigmodel.cn/api/paas/v4";
+const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.siliconflow.cn/v1";
 
-// 智谱 AI GLM-5.1 模型
-const MODEL = "glm-5.1";
+// SiliconFlow 硅基流动模型
+const MODEL = "deepseek-ai/DeepSeek-V2.5";
 
 const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to production standards:
 
