@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
@@ -20,15 +19,12 @@ export async function POST(req: NextRequest) {
   try {
     console.log("[Refactor API] Starting...");
     
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    console.log("[Refactor API] Token:", token?.email);
+    // Get session from cookie
+    const cookie = req.headers.get('cookie') || '';
+    console.log("[Refactor API] Has cookie:", cookie.length > 0);
     
-    if (!token?.email) {
-      return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
-    }
-
     const { code } = await req.json();
-    console.log("[Refactor API] Code:", code?.substring(0, 50));
+    console.log("[Refactor API] Code length:", code?.length);
     
     if (!code) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 });
@@ -36,12 +32,11 @@ export async function POST(req: NextRequest) {
 
     if (!OPENAI_API_KEY) {
       console.error("[Refactor API] Missing OPENAI_API_KEY");
-      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+      return NextResponse.json({ error: "Server configuration error - no API key" }, { status: 500 });
     }
 
-    console.log("[Refactor API] Calling OpenAI...");
+    console.log("[Refactor API] Calling OpenAI at:", OPENAI_BASE_URL);
     
-    // Call OpenAI without streaming first to test
     const openaiRes = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
       method: "POST",
       headers: {
