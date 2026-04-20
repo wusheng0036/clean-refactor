@@ -231,26 +231,28 @@ console.log('4');
           </div>
         )}
 
-        {/* Quick Examples */}
-        <div className="mb-8 flex flex-wrap items-center gap-3">
-          <span className="text-sm text-slate-400 font-medium flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Try an example:
-          </span>
-          <button
-            onClick={() => loadExample('refactor')}
-            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-500/50 text-slate-300 hover:text-blue-400 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5"
-          >
-            <Code2 className="w-4 h-4 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
-            Refactoring
-          </button>
-          <button
-            onClick={() => loadExample('eventloop')}
-            className="group flex items-center gap-2 px-4 py-2 text-sm bg-slate-800/80 hover:bg-purple-600/20 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-400 rounded-xl transition-all hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-0.5"
-          >
-            <Terminal className="w-4 h-4 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
-            Event Loop
-          </button>
+        {/* Quick Examples - Centered with Background Box */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex flex-wrap items-center justify-center gap-4 px-8 py-5 bg-[#13131a]/80 border border-slate-700/50 rounded-2xl shadow-xl shadow-black/20">
+            <span className="text-base text-slate-400 font-medium flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              Try an example:
+            </span>
+            <button
+              onClick={() => loadExample('refactor')}
+              className="group flex items-center gap-3 px-5 py-2.5 text-base bg-slate-800/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-500/50 text-slate-300 hover:text-blue-400 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5"
+            >
+              <Code2 className="w-5 h-5 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
+              Refactoring
+            </button>
+            <button
+              onClick={() => loadExample('eventloop')}
+              className="group flex items-center gap-3 px-5 py-2.5 text-base bg-slate-800/80 hover:bg-purple-600/20 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-400 rounded-xl transition-all hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-0.5"
+            >
+              <Terminal className="w-5 h-5 group-hover:scale-110 group-hover:rotate-3 transition-transform" />
+              Event Loop
+            </button>
+          </div>
         </div>
 
         {/* Code Editors with Center Button */}
