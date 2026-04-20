@@ -5,7 +5,8 @@ import { checkAccess } from "../user/status/route";
 // 硬编码硅基流动配置（测试用）
 const OPENAI_API_KEY = "sk-guqeqlonpyeeimztakfxnnztwwizbjhduabgggscbicjqyxz";
 const OPENAI_BASE_URL = "https://api.siliconflow.cn/v1";
-const MODEL = "deepseek-ai/DeepSeek-V2.5";
+// 改用更快的 Qwen 模型
+const MODEL = "Qwen/Qwen2.5-7B-Instruct";
 
 const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to production standards:
 
@@ -63,8 +64,8 @@ export async function POST(req: Request) {
 
     const isTraceMode = isExecutionTraceCode(code);
     
-    // GPT-3.5 is fast, use shorter timeout
-    const timeoutMs = isTraceMode ? 8000 : 10000;
+    // Use shorter timeout for faster models
+    const timeoutMs = isTraceMode ? 6000 : 8000;
 
     // 设置超时
     const controller = new AbortController();
@@ -83,7 +84,7 @@ export async function POST(req: Request) {
           { role: "user", content: isTraceMode ? `Analyze:\n${code}` : `Refactor:\n${code}` }
         ],
         temperature: 0.2,
-        max_tokens: isTraceMode ? 1000 : 2000, // 执行分析用较少token
+        max_tokens: isTraceMode ? 800 : 1500, // 减少token加快响应
       }),
       signal: controller.signal,
     });
