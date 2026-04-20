@@ -366,7 +366,7 @@ console.log('4');
                 Clear
               </button>
             </div>
-            <div className="h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50">
+            <div className="h-64 lg:h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50">
               <CodeEditor
                 code={code}
                 onChange={setCode}
@@ -436,7 +436,7 @@ console.log('4');
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <div className="h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50">
+            <div className="h-64 lg:h-96 bg-gradient-to-br from-emerald-800/50 via-teal-800/40 to-emerald-700/50">
               <CodeEditor
                 code={result}
                 readOnly
