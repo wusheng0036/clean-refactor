@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import { checkAccess } from "../user/status/route";
 
 // 硬编码硅基流动配置（测试用）
 const OPENAI_API_KEY = "sk-guqeqlonpyeeimztakfxnnztwwizbjhduabgggscbicjqyxz";
