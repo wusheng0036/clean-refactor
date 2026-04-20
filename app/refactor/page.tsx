@@ -148,19 +148,6 @@ function example() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownload = () => {
-    if (!result) return;
-    const blob = new Blob([result], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'refactored-code.ts';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   const handleClear = () => {
     setCode('');
     setResult('');
@@ -448,16 +435,6 @@ console.log('4');
                 >
                   {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
                   {copied ? 'Copied!' : 'Copy'}
-                </button>
-                <button
-                  onClick={handleDownload}
-                  disabled={!result}
-                  className="flex items-center gap-2 px-3 py-1.5 text-xs text-emerald-300/80 hover:text-green-400 hover:bg-green-500/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all hover:scale-105"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download
                 </button>
               </div>
             </div>
