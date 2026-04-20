@@ -242,8 +242,8 @@ console.log('4');
           </button>
         </div>
 
-        {/* Code Editors */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        {/* Code Editors with Center Button */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 mb-6 items-stretch">
           {/* Input */}
           <div className="bg-[#13131a] rounded-xl border border-slate-800 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-[#1a1a24]">
@@ -266,6 +266,34 @@ console.log('4');
               placeholder="Paste your code here..."
               spellCheck={false}
             />
+          </div>
+
+          {/* Center Refactor Button */}
+          <div className="flex items-center justify-center">
+            <button
+              onClick={handleRefactor}
+              disabled={loading || !isPaid}
+              className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-6 px-8 rounded-2xl transition-all shadow-xl shadow-blue-500/30 disabled:shadow-none min-w-[140px]"
+            >
+              <div className="relative flex flex-col items-center gap-2">
+                {loading ? (
+                  <>
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-xs">Analyzing...</span>
+                  </>
+                ) : !isPaid ? (
+                  <>
+                    <Lock className="w-8 h-8" />
+                    <span className="text-xs">PRO Only</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-10 h-10 group-hover:scale-110 transition-transform" />
+                    <span className="text-sm">Refactor</span>
+                  </>
+                )}
+              </div>
+            </button>
           </div>
 
           {/* Output */}
@@ -293,32 +321,6 @@ console.log('4');
             />
           </div>
         </div>
-
-        {/* Action Button */}
-        <button
-          onClick={handleRefactor}
-          disabled={loading || !isPaid}
-          className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold py-4 px-8 rounded-xl transition-all shadow-lg shadow-blue-500/25 disabled:shadow-none"
-        >
-          <div className="relative flex items-center justify-center gap-3">
-            {loading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>AI is analyzing your code...</span>
-              </>
-            ) : !isPaid ? (
-              <>
-                <Lock className="w-5 h-5" />
-                <span>Upgrade to PRO to Refactor</span>
-              </>
-            ) : (
-              <>
-                <Zap className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <span>Refactor with AI</span>
-              </>
-            )}
-          </div>
-        </button>
 
         {/* Analysis Section */}
         {analysis && (
