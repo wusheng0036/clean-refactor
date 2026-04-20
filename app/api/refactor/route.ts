@@ -58,8 +58,10 @@ export async function POST(req: Request) {
 
     const isTraceMode = isExecutionTraceCode(code);
     
-    // 根据选择的模型调用不同的 API
-    if (model === 'zhipu') {
+    // 自动切换：执行顺序分析用智谱（更强），普通重构用硅基（更快）
+    const useZhipu = isTraceMode || model === 'zhipu';
+    
+    if (useZhipu) {
       return await callZhipuAPI(code, isTraceMode);
     } else {
       return await callSiliconFlowAPI(code, isTraceMode);
@@ -125,6 +127,7 @@ async function callSiliconFlowAPI(code: string, isTraceMode: boolean) {
   return NextResponse.json({
     refactoredCode: content,
     mode: "refactor",
+    model: "siliconflow",
   });
 }
 
@@ -183,5 +186,6 @@ async function callZhipuAPI(code: string, isTraceMode: boolean) {
   return NextResponse.json({
     refactoredCode: content,
     mode: "refactor",
+    model: "zhipu",
   });
 }

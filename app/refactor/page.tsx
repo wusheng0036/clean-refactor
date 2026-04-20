@@ -42,7 +42,7 @@ function example() {
   const [mode, setMode] = useState<'refactor' | 'execution-trace'>('refactor');
   const [analysis, setAnalysis] = useState<any>(null);
   const [copied, setCopied] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<'siliconflow' | 'zhipu'>('siliconflow');
+  const [usedModel, setUsedModel] = useState<string>('');
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -83,7 +83,7 @@ function example() {
       const res = await fetch('/api/refactor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, model: selectedModel }),
+        body: JSON.stringify({ code }),
       });
 
       const data = await res.json();
@@ -93,6 +93,7 @@ function example() {
       } else {
         setMode(data.mode || 'refactor');
         setExecutionTrace(data.executionTrace || null);
+        setUsedModel(data.model || '');
         
         // For execution trace mode, format the result nicely
         if (data.mode === 'execution-trace' && data.executionTrace) {
@@ -266,6 +267,20 @@ console.log('4');
             <span className="text-sm font-semibold text-white">{session?.user?.name || session?.user?.email?.split('@')[0] || '开发者'}</span>
           </div>
         </div>
+
+        {/* Model Indicator */}
+        {usedModel && (
+          <div className="flex justify-center mb-4">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+              usedModel === 'zhipu' 
+                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
+                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+            }`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+              {usedModel === 'zhipu' ? '智谱 GLM-4' : 'SiliconFlow DeepSeek'}
+            </div>
+          </div>
+        )}
 
         {/* Error */}
         {error && (
