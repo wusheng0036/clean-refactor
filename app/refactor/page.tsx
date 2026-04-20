@@ -47,7 +47,7 @@ function example() {
     const checkUserStatus = async () => {
       if (status === 'authenticated' && session?.user?.email) {
         try {
-          const res = await fetch('/api/user/status-edge');
+          const res = await fetch('/api/user/status');
           if (res.ok) {
             const data = await res.json();
             console.log('Setting isPaid to:', data.isPaid);
