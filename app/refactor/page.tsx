@@ -347,8 +347,8 @@ console.log('4');
           </div>
         )}
 
-        {/* Code Editors with Center Button */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 mb-8 items-stretch">
+        {/* Code Editors with Center Button - Mobile: vertical stack, Desktop: side by side */}
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] gap-4 lg:gap-6 mb-8">
           {/* Input - Bright Green Background */}
           <div className="group rounded-2xl border border-emerald-600/40 overflow-hidden shadow-2xl shadow-black/20 hover:border-emerald-400/50 hover:shadow-emerald-500/10 transition-all duration-300">
             <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-700/40 bg-gradient-to-r from-emerald-800/80 to-teal-800/60">
@@ -376,12 +376,11 @@ console.log('4');
           </div>
 
           {/* Center Refactor Button - Subtle 3D */}
-          <div className="flex items-center justify-center py-4 lg:py-0">
+          <div className="flex items-center justify-center py-2 lg:py-0 order-first lg:order-none">
             <button
               onClick={handleRefactor}
               disabled={loading || !isPaid}
-              className="group relative disabled:cursor-not-allowed min-w-[140px]"
-            >
+              className="group relative disabled:cursor-not-allowed min-w-[120px] lg:min-w-[140px]"
               {/* Subtle 3D Shadow */}
               <div className="absolute inset-0 bg-purple-600/50 rounded-2xl translate-y-1.5 group-hover:translate-y-2 group-active:translate-y-0.5 transition-transform duration-150 blur-sm" />
               
