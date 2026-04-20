@@ -184,14 +184,7 @@ console.log('4');
               <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:scale-105 transition-all duration-300 cursor-pointer">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-lg font-bold text-white tracking-tight">CleanRefactor AI</h1>
-                <p className="text-xs text-slate-400 flex items-center gap-1">
-                  <span className="text-blue-400">👋</span>
-                  <span>嘿，</span>
-                  <span className="text-slate-200 font-medium">{session?.user?.name || session?.user?.email?.split('@')[0] || '开发者'}</span>
-                </p>
-              </div>
+              <h1 className="text-lg font-bold text-white tracking-tight">CleanRefactor AI</h1>
             </div>
             
             <div className="flex items-center gap-3">
@@ -221,6 +214,15 @@ console.log('4');
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* User Greeting - Centered with Badge */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-blue-500/30 rounded-full shadow-lg shadow-blue-500/10">
+            <span className="text-lg">👋</span>
+            <span className="text-sm text-slate-300">嘿，</span>
+            <span className="text-sm font-semibold text-white">{session?.user?.name || session?.user?.email?.split('@')[0] || '开发者'}</span>
+          </div>
+        </div>
+
         {/* Error */}
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-400">
