@@ -1,18 +1,6 @@
 {
   "version": 2,
   "name": "cleanrefactor-ai",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "functions": {
     "app/api/refactor/route.ts": {
       "maxDuration": 60

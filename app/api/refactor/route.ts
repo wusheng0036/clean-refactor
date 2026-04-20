@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
@@ -13,16 +14,20 @@ const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to pr
 
 Return ONLY the refactored code, no explanations.`;
 
-export const runtime = 'edge';
+// Use Node.js runtime with extended timeout (requires Vercel Pro or config)
+export const maxDuration = 60;
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     console.log("[Refactor API] Starting...");
     
-    // Get session from cookie
-    const cookie = req.headers.get('cookie') || '';
-    console.log("[Refactor API] Has cookie:", cookie.length > 0);
+    const session = await auth();
+    console.log("[Refactor API] Session:", session?.user?.email);
     
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { code } = await req.json();
     console.log("[Refactor API] Code length:", code?.length);
     
@@ -32,10 +37,13 @@ export async function POST(req: NextRequest) {
 
     if (!OPENAI_API_KEY) {
       console.error("[Refactor API] Missing OPENAI_API_KEY");
-      return NextResponse.json({ error: "Server configuration error - no API key" }, { status: 500 });
+      return NextResponse.json({ error: "Server config error" }, { status: 500 });
     }
 
-    console.log("[Refactor API] Calling OpenAI at:", OPENAI_BASE_URL);
+    console.log("[Refactor API] Calling OpenAI...");
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
     
     const openaiRes = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
       method: "POST",
@@ -50,9 +58,12 @@ export async function POST(req: NextRequest) {
           { role: "user", content: `Refactor this code:\n\n${code}` }
         ],
         temperature: 0.2,
-        max_tokens: 2000,
+        max_tokens: 1500,
       }),
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
     console.log("[Refactor API] OpenAI status:", openaiRes.status);
 
@@ -68,7 +79,7 @@ export async function POST(req: NextRequest) {
     const data = await openaiRes.json();
     const refactoredCode = data.choices?.[0]?.message?.content || "";
     
-    console.log("[Refactor API] Success, code length:", refactoredCode.length);
+    console.log("[Refactor API] Success, length:", refactoredCode.length);
 
     return NextResponse.json({
       refactoredCode,
@@ -76,9 +87,13 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("[Refactor API] Error:", err);
+    if (err.name === 'AbortError') {
+      return NextResponse.json({ 
+        error: "Request timeout - AI took too long to respond" 
+      }, { status: 504 });
+    }
     return NextResponse.json({ 
-      error: err.message || "Server error",
-      stack: err.stack
+      error: err.message || "Server error" 
     }, { status: 500 });
   }
 }
