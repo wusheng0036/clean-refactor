@@ -286,20 +286,6 @@ console.log('4');
           </div>
         </div>
 
-        {/* Model Indicator */}
-        {usedModel && (
-          <div className="flex justify-center mb-4">
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-              usedModel === 'zhipu' 
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
-                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-            }`}>
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-              {usedModel === 'zhipu' ? '智谱 GLM-4' : 'SiliconFlow DeepSeek'}
-            </div>
-          </div>
-        )}
-
         {/* Error */}
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-400">
@@ -331,21 +317,6 @@ console.log('4');
             </button>
           </div>
         </div>
-
-        {/* Used Model Display */}
-        {usedModel && (
-          <div className="flex justify-center mb-6">
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-              usedModel === 'zhipu' 
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' 
-                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-            }`}>
-              <span>AI Model:</span>
-              <span>{usedModel === 'zhipu' ? '智谱 GLM-4' : '硅基 DeepSeek'}</span>
-              {usedModel === 'zhipu' && <span className="text-[10px] opacity-70">(auto)</span>}
-            </div>
-          </div>
-        )}
 
         {/* Code Editors with Center Button - Mobile: vertical stack, Desktop: side by side */}
         <div className="flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] gap-4 lg:gap-6 mb-8">
