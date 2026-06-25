@@ -60,12 +60,21 @@ https://github.com/wusheng0036/clean-refactor/issues
 
 If a real support inbox is created later, update `app/legal-page.tsx` and the policy wording.
 
+## Vercel Access Notes
+
+- Do not commit Vercel tokens or other deployment credentials to this repository.
+- If automation needs Vercel access, store the token outside git, for example in a password manager or a local-only shell profile as `VERCEL_TOKEN`.
+- The current project is hosted under the Vercel account/team `yongdong0889-2744s-projects` and project name `cleanrefactor-ai`.
+- To inspect or deploy with the CLI, use `npx vercel inspect https://cleanrefactor-ai.vercel.app --token "$VERCEL_TOKEN"` or `npx vercel --prod --token "$VERCEL_TOKEN"` after confirming project linkage.
+- Rotate or revoke temporary Vercel tokens after maintenance work is complete.
+
 ## Security Notes
 
 - Basic security headers are configured in `next.config.ts` for Vercel.
 - `public/_headers` is also present as a portable static-hosting fallback.
 - The app should avoid collecting secrets or confidential code. The legal pages warn users not to submit sensitive code or credentials.
 - Previously exposed credentials in repository history should be rotated in the relevant provider dashboards.
+- The GitHub and Vercel tokens shared during maintenance were temporary operational credentials and should not be stored in source control.
 
 ## Recommended Follow-Up
 
