@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 
 // 硬编码沙箱凭证（测试阶段）
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'AVL437-aKd1dRmJiPzj_qOfEiZP12GngINf54ml5BySCpTP2j54Z_L-wqj7fy601rag0yxOxa5UyvezR';
-const PAYPAL_SECRET = process.env.PAYPAL_SECRET || 'ECOEhiHxxz85p1usKiHAyZR5yaR52BwNpT7vRNkgWNeYGqgwr8gfkM1Z5ySBQ9OiEvbdJQx06LuJfceX';
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
 const PAYPAL_API = 'https://api-m.sandbox.paypal.com';
 
 export async function GET() {
   try {
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET) {
+      return NextResponse.json({ success: false, error: 'PayPal is not configured' }, { status: 500 });
+    }
+
     // 测试PayPal认证
     const basicAuth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64');
     

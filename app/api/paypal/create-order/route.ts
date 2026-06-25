@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
 // 硬编码沙箱凭证（测试阶段）
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'AVL437-aKd1dRmJiPzj_qOfEiZP12GngINf54ml5BySCpTP2j54Z_L-wqj7fy601rag0yxOxa5UyvezR';
-const PAYPAL_SECRET = process.env.PAYPAL_SECRET || 'ECOEhiHxxz85p1usKiHAyZR5yaR52BwNpT7vRNkgWNeYGqgwr8gfkM1Z5ySBQ9OiEvbdJQx06LuJfceX';
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
 const PAYPAL_MODE = process.env.PAYPAL_MODE || 'sandbox';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || 'https://cleanrefactor-ai.vercel.app';
 const PRICE = process.env.NEXT_PUBLIC_PRODUCT_PRICE || '14.99';
@@ -27,6 +27,10 @@ export async function POST(req: Request) {
     
     if (!email) {
       return NextResponse.json({ error: 'Email required' }, { status: 400 });
+    }
+
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET) {
+      return NextResponse.json({ error: 'PayPal is not configured' }, { status: 500 });
     }
     
     const basicAuth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64');

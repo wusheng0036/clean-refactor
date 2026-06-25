@@ -688,10 +688,14 @@ export function HomeContent() {
             {loading ? 'Connecting to PayPal...' : `Get Lifetime Access — $${PRICE}`}
           </button>
           
-          <div style={{ marginTop: '20px', fontSize: '13px', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <div style={{ marginTop: '20px', fontSize: '13px', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span>🔒 Secure Checkout</span>
             <span>•</span>
-            <span>30-Day Refund</span>
+            <Link href="/refund" style={{ color: '#64748b', textDecoration: 'underline' }}>30-Day Refund</Link>
+            <span>•</span>
+            <Link href="/terms" style={{ color: '#64748b', textDecoration: 'underline' }}>Terms</Link>
+            <span>•</span>
+            <Link href="/privacy" style={{ color: '#64748b', textDecoration: 'underline' }}>Privacy</Link>
           </div>
 
 
@@ -716,6 +720,12 @@ export function HomeContent() {
 
       {/* Footer */}
       <footer style={{ marginTop: '80px', textAlign: 'center', padding: '32px', borderTop: '1px solid #e2e8f0', color: '#94a3b8', fontSize: '13px' }}>
+        <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <Link href="/privacy" style={{ color: '#64748b' }}>Privacy</Link>
+          <Link href="/terms" style={{ color: '#64748b' }}>Terms</Link>
+          <Link href="/security" style={{ color: '#64748b' }}>Security</Link>
+          <Link href="/refund" style={{ color: '#64748b' }}>Refunds</Link>
+        </div>
         © 2026 CleanRefactor AI. Built for modern developers.
       </footer>
     </div>

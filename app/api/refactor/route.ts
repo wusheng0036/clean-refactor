@@ -2,11 +2,11 @@ import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 // SiliconFlow 配置
-const SILICONFLOW_API_KEY = "sk-guqeqlonpyeeimztakfxnnztwwizbjhduabgggscbicjqyxz";
+const SILICONFLOW_API_KEY = process.env.SILICONFLOW_API_KEY;
 const SILICONFLOW_API_URL = "https://api.siliconflow.cn/v1/chat/completions";
 
 // 智谱配置
-const ZHIPU_API_KEY = "fc16254595884511b0db517f57ccb0f3.5AUQnLU217w7DIZy";
+const ZHIPU_API_KEY = process.env.ZHIPU_API_KEY;
 const ZHIPU_API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 
 const REFACTOR_PROMPT = `You are a senior software engineer. Refactor code to production standards:
@@ -62,8 +62,14 @@ export async function POST(req: Request) {
     const useZhipu = isTraceMode || model === 'zhipu';
     
     if (useZhipu) {
+      if (!ZHIPU_API_KEY) {
+        return NextResponse.json({ error: "AI service is not configured" }, { status: 500 });
+      }
       return await callZhipuAPI(code, isTraceMode);
     } else {
+      if (!SILICONFLOW_API_KEY) {
+        return NextResponse.json({ error: "AI service is not configured" }, { status: 500 });
+      }
       return await callSiliconFlowAPI(code, isTraceMode);
     }
   } catch (err: any) {
